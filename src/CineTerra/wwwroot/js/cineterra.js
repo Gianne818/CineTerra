@@ -7,7 +7,9 @@ window.cineterra = window.cineterra || {
 
     // Scroll-Driven Scenery Observer for Full-Bleed Immersion
     _sceneryObserver: null,
-    
+    _sceneryScrollHandler: null,
+    _sceneryResizeHandler: null,
+
     initScrollScenery: function (dotNetHelper) {
         return this.initSceneryScroll(dotNetHelper);
     },
@@ -21,15 +23,24 @@ window.cineterra = window.cineterra || {
 
         if (!sections || sections.length === 0) return;
 
+        var currentIndex = -1;
+
         var setActiveIndex = function (index, locationId) {
+            if (index < 0 || index >= sections.length) return;
+            if (index === currentIndex) return;
+            currentIndex = index;
+
             backdrops.forEach(function (el, i) {
                 var elLoc = el.getAttribute('data-location-id');
-                if (i === index || (locationId && elLoc === locationId)) {
+                var elIdx = el.getAttribute('data-backdrop-index');
+                var matches = (i === index) || (elIdx !== null && parseInt(elIdx, 10) === index) || (locationId && elLoc === locationId);
+                if (matches) {
                     el.classList.add('stage-backdrop--active', 'scenery-backdrop--active');
                 } else {
                     el.classList.remove('stage-backdrop--active', 'scenery-backdrop--active');
                 }
             });
+
             dockItems.forEach(function (el, i) {
                 if (i === index) {
                     el.classList.add('scenery-dock-dot--active');
@@ -37,6 +48,7 @@ window.cineterra = window.cineterra || {
                     el.classList.remove('scenery-dock-dot--active');
                 }
             });
+
             sections.forEach(function (el, i) {
                 if (i === index) {
                     el.classList.add('scenery-section--active');
@@ -44,6 +56,7 @@ window.cineterra = window.cineterra || {
                     el.classList.remove('scenery-section--active');
                 }
             });
+
             if (dotNetHelper) {
                 try {
                     dotNetHelper.invokeMethodAsync('OnChapterChanged', index);
@@ -56,24 +69,56 @@ window.cineterra = window.cineterra || {
             }
         };
 
-        if ('IntersectionObserver' in window) {
-            var observer = new IntersectionObserver(function (entries) {
-                entries.forEach(function (entry) {
-                    if (entry.isIntersecting) {
-                        var idxAttr = entry.target.getAttribute('data-chapter-index') || entry.target.getAttribute('data-scenery-index');
-                        var locAttr = entry.target.getAttribute('data-location-id');
-                        var idx = parseInt(idxAttr, 10);
-                        if (!isNaN(idx)) {
-                            setActiveIndex(idx, locAttr);
-                        } else if (locAttr) {
-                            var secIdx = Array.prototype.indexOf.call(sections, entry.target);
-                            setActiveIndex(secIdx, locAttr);
-                        }
-                    }
+        // Viewport focal calculation: accurately tracks which section is centered at reading level
+        var ticking = false;
+        var checkScroll = function () {
+            var vHeight = window.innerHeight || document.documentElement.clientHeight || 800;
+            var focalPoint = vHeight * 0.45;
+
+            var bestIdx = -1;
+            var minDistance = Infinity;
+
+            for (var i = 0; i < sections.length; i++) {
+                var rect = sections[i].getBoundingClientRect();
+                if (rect.top <= focalPoint && rect.bottom >= focalPoint) {
+                    bestIdx = i;
+                    break;
+                }
+                var secCenter = (rect.top + rect.bottom) / 2;
+                var dist = Math.abs(secCenter - focalPoint);
+                if (dist < minDistance) {
+                    minDistance = dist;
+                    bestIdx = i;
+                }
+            }
+
+            if (bestIdx >= 0 && bestIdx < sections.length) {
+                var locAttr = sections[bestIdx].getAttribute('data-location-id');
+                setActiveIndex(bestIdx, locAttr);
+            }
+        };
+
+        var onScroll = function () {
+            if (!ticking) {
+                window.requestAnimationFrame(function () {
+                    checkScroll();
+                    ticking = false;
                 });
+                ticking = true;
+            }
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
+        window.addEventListener('resize', onScroll, { passive: true });
+        this._sceneryScrollHandler = onScroll;
+        this._sceneryResizeHandler = onScroll;
+
+        if ('IntersectionObserver' in window) {
+            var observer = new IntersectionObserver(function () {
+                onScroll();
             }, {
-                threshold: [0.35, 0.5, 0.7],
-                rootMargin: '-10% 0px -10% 0px'
+                threshold: [0.1, 0.3, 0.5, 0.7],
+                rootMargin: '-5% 0px -5% 0px'
             });
 
             sections.forEach(function (sec) {
@@ -82,12 +127,23 @@ window.cineterra = window.cineterra || {
 
             this._sceneryObserver = observer;
         }
+
+        // Initialize immediately
+        checkScroll();
     },
 
     disposeScrollScenery: function () {
         if (this._sceneryObserver) {
             this._sceneryObserver.disconnect();
             this._sceneryObserver = null;
+        }
+        if (this._sceneryScrollHandler) {
+            window.removeEventListener('scroll', this._sceneryScrollHandler);
+            this._sceneryScrollHandler = null;
+        }
+        if (this._sceneryResizeHandler) {
+            window.removeEventListener('resize', this._sceneryResizeHandler);
+            this._sceneryResizeHandler = null;
         }
     },
 

@@ -11,15 +11,15 @@
     },
     "description": "An abandoned 1934 fan-shaped railway roundhouse that served as the primary real-world visual model for the forgotten onsen town ruins where Suzume first encounters Souta and opens the mythical door.",
     "practicalTips": "Take the JR Kyudai Main Line to Bungo-Mori Station. The preserved concrete turntable and depot ruins are a 5-minute walk from the south exit. Best photographed in afternoon light.",
-    "imageUrl": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1000&q=80",
+    "imageUrl": "images/locations/bungo-mori.jpg",
     "accessibility": "EasyWalk",
     "scenes": [
       {
         "productionId": "suzume-2022",
         "title": "The First Door in the Ruins",
         "timestamp": "00:14:22",
-        "stillImageUrl": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=900&q=80",
-        "realImageUrl": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=900&q=80",
+        "stillImageUrl": "images/scenes/suzume-bungo-mori-still.jpg",
+        "realImageUrl": "images/scenes/suzume-bungo-mori-real.jpg",
         "sceneDescription": "Suzume rides her bicycle up the overgrown hill path and finds the freestanding weathered door standing amidst flooded roundhouse arches."
       }
     ]
@@ -36,15 +36,15 @@
     },
     "description": "The dramatic concrete arch bridge spanning the Kanda River where multiple train lines (Chuo, Sobu, and Tokyo Metro Marunouchi) cross simultaneously, featured in Suzume's climactic Tokyo worm battle.",
     "practicalTips": "Located immediately outside JR Ochanomizu Station. Stand on the northern pedestrian walkway looking downstream toward Akihabara to frame the exact anime perspective.",
-    "imageUrl": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=1000&q=80",
+    "imageUrl": "images/locations/hijiribashi.jpg",
     "accessibility": "EasyWalk",
     "scenes": [
       {
         "productionId": "suzume-2022",
         "title": "The Leap Above the Kanda River",
         "timestamp": "01:08:45",
-        "stillImageUrl": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=900&q=80",
-        "realImageUrl": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=900&q=80",
+        "stillImageUrl": "images/scenes/suzume-hijiribashi-still.png",
+        "realImageUrl": "images/scenes/suzume-hijiribashi-real.jpg",
         "sceneDescription": "Suzume leaps off the granite balustrade of Hijiribashi Bridge onto the roof of an oncoming train car to reach the gigantic spectral worm over Tokyo."
       }
     ]
@@ -61,15 +61,15 @@
     },
     "description": "Known as the Valley of the Moon, this UNESCO World Heritage sandstone and granite desert valley stood in for the vast, unforgiving sands of planet Arrakis in Denis Villeneuve's Dune.",
     "practicalTips": "Hire an official Bedouin 4x4 guide from the Wadi Rum Visitor Center. Early morning and golden hour offer the exact amber-saturated tones captured in the film.",
-    "imageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1000&q=80",
+    "imageUrl": "images/locations/wadi-rum.jpg",
     "accessibility": "Moderate",
     "scenes": [
       {
         "productionId": "dune-2021",
         "title": "Arrival on Arrakis",
         "timestamp": "00:41:10",
-        "stillImageUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=900&q=80",
-        "realImageUrl": "https://images.unsplash.com/photo-1547234935-80c7145ec969?w=900&q=80",
+        "stillImageUrl": "images/scenes/dune-arrakis-still.jpg",
+        "realImageUrl": "images/scenes/dune-arrakis-real.jpg",
         "sceneDescription": "House Atreides ornithopters sweep low over towering sheer sandstone monoliths and shifting crimson dunes."
       }
     ]
@@ -86,15 +86,15 @@
     },
     "description": "A picturesque sheep farm transformed into the permanent 12-acre Shire set featuring 44 rebuilt hobbit holes, the Green Dragon Inn, and the iconic Party Tree.",
     "practicalTips": "Advance booking is required weeks in advance. Twilight banquet tours provide exclusive access after tourist groups leave, with warm lantern light reflecting in the lake.",
-    "imageUrl": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1000&q=80",
+    "imageUrl": "images/locations/matamata-hobbiton.jpg",
     "accessibility": "EasyWalk",
     "scenes": [
       {
         "productionId": "lotr-fellowship-2001",
         "title": "Concerning Hobbits",
         "timestamp": "00:08:15",
-        "stillImageUrl": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80",
-        "realImageUrl": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=900&q=80",
+        "stillImageUrl": "images/scenes/lotr-hobbiton-still.jpg",
+        "realImageUrl": "images/scenes/lotr-hobbiton-real.jpg",
         "sceneDescription": "Gandalf arrives in his wooden cart along the winding Shire lane as young hobbits run through rolling emerald hills."
       }
     ]
@@ -111,15 +111,15 @@
     },
     "description": "A precipitous jagged Atlantic sea crag crowned by an ancient 6th-century Christian monastic settlement, cast as Luke Skywalker's solitary refuge on the sacred Jedi island of Ahch-To.",
     "practicalTips": "Licensed passenger boat landings run strictly between May and September and are heavily weather-dependent. Requires climbing 618 steep, hand-carved stone steps without handrails.",
-    "imageUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000&q=80",
+    "imageUrl": "images/locations/skellig-michael.jpg",
     "accessibility": "Challenging",
     "scenes": [
       {
         "productionId": "star-wars-last-jedi-2017",
         "title": "The Hermit of Ahch-To",
         "timestamp": "00:15:30",
-        "stillImageUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=900&q=80",
-        "realImageUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=900&q=80",
+        "stillImageUrl": "images/scenes/star-wars-ahch-to-still.jpg",
+        "realImageUrl": "images/scenes/star-wars-ahch-to-real.jpg",
         "sceneDescription": "Rey offers the ancestral Skywalker lightsaber to Luke atop the misty ocean cliff among ancient beehive drystone huts."
       }
     ]
@@ -136,15 +136,15 @@
     },
     "description": "A pristine medieval walled harbor city on the Adriatic coast that served as the primary set for King's Landing, capital of the Seven Kingdoms in Game of Thrones.",
     "practicalTips": "Walk the 1.9 km perimeter walls at opening (08:00) before tour cruise crowds arrive. The Jesuit Stairs (Walk of Shame) are near Gundulic Square.",
-    "imageUrl": "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=1000&q=80",
+    "imageUrl": "images/locations/dubrovnik-old-town.jpg",
     "accessibility": "Moderate",
     "scenes": [
       {
         "productionId": "game-of-thrones-2011",
         "title": "Battle of the Blackwater",
         "timestamp": "00:48:10",
-        "stillImageUrl": "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=900&q=80",
-        "realImageUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=900&q=80",
+        "stillImageUrl": "images/scenes/got-kings-landing-still.jpg",
+        "realImageUrl": "images/scenes/got-kings-landing-real.jpg",
         "sceneDescription": "Stannis Baratheon's royal fleet advances on King's Landing harbor beneath the ramparts of the Red Keep."
       }
     ]
@@ -161,15 +161,15 @@
     },
     "description": "A striking two-level steel bridge over the Seine with a dedicated viaduct colonnade, famously featured as Ariadne's dream-architecture training ground in Inception.",
     "practicalTips": "Metro Line 6 stops right at Passy or Bir-Hakeim. Stand in the central steel arch arcade facing the Eiffel Tower to replicate the mirror-fold scene.",
-    "imageUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1000&q=80",
+    "imageUrl": "images/locations/pont-de-bir-hakeim.jpg",
     "accessibility": "EasyWalk",
     "scenes": [
       {
         "productionId": "inception-2010",
         "title": "Architecting the Subconscious",
         "timestamp": "00:32:40",
-        "stillImageUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=900&q=80",
-        "realImageUrl": "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=900&q=80",
+        "stillImageUrl": "images/scenes/inception-bir-hakeim-still.jpg",
+        "realImageUrl": "images/scenes/inception-bir-hakeim-real.jpg",
         "sceneDescription": "Cobb instructs Ariadne on subconscious physics as she creates giant mirrors that reflect the steel bridge viaduct into an infinite corridor."
       }
     ]
@@ -186,15 +186,15 @@
     },
     "description": "The iconic steep stone staircase with crimson lacquered iron railings leading up to Suga Shrine, immortalized as the climactic meeting place in Makoto Shinkai's Your Name.",
     "practicalTips": "A 10-minute walk from Yotsuya-Sanchome Station along peaceful residential alleyways. Please maintain silence as this is a living neighborhood shrine.",
-    "imageUrl": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1000&q=80",
+    "imageUrl": "images/locations/suga-shrine-stairs.jpg",
     "accessibility": "EasyWalk",
     "scenes": [
       {
         "productionId": "your-name-2016",
         "title": "May I Ask Your Name?",
         "timestamp": "01:42:15",
-        "stillImageUrl": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=900&q=80",
-        "realImageUrl": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=900&q=80",
+        "stillImageUrl": "images/scenes/your-name-suga-stairs-still.png",
+        "realImageUrl": "images/scenes/your-name-suga-stairs-real.jpg",
         "sceneDescription": "Taki and Mitsuha pass each other on the stone steps, pause, and turn around simultaneously to ask for each other's name."
       }
     ]
