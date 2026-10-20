@@ -1,0 +1,55 @@
+@namespace CineTerra.Components.Common
+
+@if (!string.IsNullOrEmpty(Href))
+{
+    <a href="@Href"
+       class="@ComputedClass"
+       aria-label="@AriaLabel"
+       aria-disabled="@(Disabled ? "true" : null)"
+       tabindex="@(Disabled ? -1 : 0)"
+       @onclick="HandleClick"
+       @attributes="AdditionalAttributes">
+        @if (IsLoading)
+        {
+            <span class="cinema-btn__spinner" aria-hidden="true"></span>
+        }
+        @if (IconLeading is not null)
+        {
+            <span class="cinema-btn__icon cinema-btn__icon--leading" aria-hidden="true">@IconLeading</span>
+        }
+        @if (ChildContent is not null)
+        {
+            <span class="cinema-btn__content">@ChildContent</span>
+        }
+        @if (IconTrailing is not null)
+        {
+            <span class="cinema-btn__icon cinema-btn__icon--trailing" aria-hidden="true">@IconTrailing</span>
+        }
+    </a>
+}
+else
+{
+    <button type="@Type"
+            class="@ComputedClass"
+            aria-label="@AriaLabel"
+            disabled="@(Disabled || IsLoading)"
+            @onclick="HandleClick"
+            @attributes="AdditionalAttributes">
+        @if (IsLoading)
+        {
+            <span class="cinema-btn__spinner" aria-hidden="true"></span>
+        }
+        @if (IconLeading is not null)
+        {
+            <span class="cinema-btn__icon cinema-btn__icon--leading" aria-hidden="true">@IconLeading</span>
+        }
+        @if (ChildContent is not null)
+        {
+            <span class="cinema-btn__content">@ChildContent</span>
+        }
+        @if (IconTrailing is not null)
+        {
+            <span class="cinema-btn__icon cinema-btn__icon--trailing" aria-hidden="true">@IconTrailing</span>
+        }
+    </button>
+}

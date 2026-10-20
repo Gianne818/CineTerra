@@ -1,0 +1,139 @@
+.cinema-loader {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  color: var(--color-ink-muted);
+  padding: 1.5rem;
+}
+
+.cinema-loader--fullscreen {
+  min-height: 60vh;
+  width: 100%;
+}
+
+.cinema-loader__visual {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Light beam / aperture pulse */
+.cinema-loader__beam {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(194, 120, 3, 0.25) 0%, rgba(194, 120, 3, 0) 70%);
+  animation: beamPulse 1.8s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* Sizes */
+.cinema-loader--sm .cinema-loader__reel {
+  width: 24px;
+  height: 24px;
+}
+.cinema-loader--sm .cinema-loader__beam {
+  width: 12px;
+  height: 12px;
+}
+
+.cinema-loader--md .cinema-loader__reel {
+  width: 44px;
+  height: 44px;
+}
+.cinema-loader--md .cinema-loader__beam {
+  width: 24px;
+  height: 24px;
+}
+
+.cinema-loader--lg .cinema-loader__reel {
+  width: 64px;
+  height: 64px;
+}
+.cinema-loader--lg .cinema-loader__beam {
+  width: 36px;
+  height: 36px;
+}
+
+/* SVG elements */
+.cinema-loader__reel {
+  display: block;
+  color: var(--color-ink-secondary);
+  animation: reelSpin 2.4s linear infinite;
+  transform-origin: center center;
+}
+
+.cinema-loader__core {
+  fill: var(--color-accent);
+}
+
+.cinema-loader__rim {
+  opacity: 0.6;
+}
+
+/* Meta Text */
+.cinema-loader__meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.cinema-loader__label {
+  font-family: var(--font-body);
+  font-size: var(--step-body);
+  color: var(--color-ink);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.cinema-loader__telemetry {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--color-accent);
+  letter-spacing: 0.02em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+@keyframes reelSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes beamPulse {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cinema-loader__reel,
+  .cinema-loader__beam {
+    animation: none;
+  }
+}

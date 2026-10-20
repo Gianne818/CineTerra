@@ -1,0 +1,203 @@
+/* StopItem — Light Mode Clean Pilgrimage Stop Card */
+.stop-item {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.15rem 1.35rem;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-md, 16px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+    transition: transform var(--duration-fast, 160ms) ease, 
+                box-shadow var(--duration-fast, 160ms) ease,
+                border-color var(--duration-fast, 160ms) ease;
+}
+
+.stop-item:hover {
+    border-color: rgba(217, 119, 6, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+/* Reorder column */
+.stop-item__reorder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.stop-item__order {
+    font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+    font-size: 0.875rem;
+    color: #d97706; /* Warm Amber */
+    font-weight: 700;
+    line-height: 1;
+}
+
+.stop-item__btn--arrow {
+    width: 24px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: var(--radius-xs, 4px);
+    color: #64748b;
+    font-size: 0.65rem;
+    cursor: pointer;
+    transition: all var(--duration-fast, 160ms) ease;
+}
+
+.stop-item__btn--arrow:hover:not(:disabled) {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+
+.stop-item__btn--arrow:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+/* Thumbnail */
+.stop-item__thumb-wrap {
+    width: 72px;
+    height: 72px;
+    border-radius: var(--radius-sm, 8px);
+    overflow: hidden;
+    background-color: #f1f3f5;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.stop-item__thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.stop-item__thumb-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #94a3b8;
+    font-size: 1.25rem;
+}
+
+/* Details */
+.stop-item__details {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-width: 0;
+}
+
+.stop-item__name {
+    font-family: var(--font-display, "Playfair Display", Georgia, serif);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.stop-item__place {
+    font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin: 0;
+}
+
+/* Clean Day Stepper */
+.stop-item__stepper {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: var(--radius-pill, 9999px);
+    padding: 0.25rem 0.5rem;
+}
+
+.stop-item__btn--step {
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 50%;
+    color: #1e293b;
+    font-size: 0.9rem;
+    font-weight: 700;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    transition: all var(--duration-fast, 160ms) ease;
+}
+
+.stop-item__btn--step:hover:not(:disabled) {
+    background: #d97706;
+    color: #ffffff;
+    border-color: #d97706;
+}
+
+.stop-item__btn--step:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}
+
+.stop-item__days-label {
+    font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #475569;
+    min-width: 46px;
+    text-align: center;
+}
+
+.stop-item__days-label strong {
+    color: #0f172a;
+    font-weight: 700;
+}
+
+/* Remove button */
+.stop-item__btn--remove {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 50%;
+    color: #94a3b8;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all var(--duration-fast, 160ms) ease;
+}
+
+.stop-item__btn--remove:hover {
+    background: #fee2e2;
+    color: #ef4444;
+    border-color: #fca5a5;
+}
+
+@media (max-width: 640px) {
+    .stop-item {
+        flex-wrap: wrap;
+        gap: 0.85rem;
+        padding: 1rem;
+    }
+    .stop-item__details {
+        flex: 1 1 calc(100% - 130px);
+    }
+}

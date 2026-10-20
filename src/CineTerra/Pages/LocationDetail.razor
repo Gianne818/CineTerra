@@ -1,0 +1,305 @@
+@page "/locations/{Id}"
+@namespace CineTerra.Pages
+@inject ILocationService LocationService
+@inject IProductionService ProductionService
+@inject IPassportService PassportService
+@inject PilgrimageState Pilgrimage
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>@(_location is not null ? $"{_location.Name} · CineTerra" : "Destination Dossier · CineTerra")</PageTitle>
+
+<div class="location-detail-page">
+    <div class="location-detail-page__inner">
+        <!-- Breadcrumb & Back -->
+        <nav class="detail-nav" aria-label="Breadcrumbs">
+            <AppButton Variant="ghost" Size="sm" Href="@AppRoutes.Explore">
+                ← Back to Destinations Archive
+            </AppButton>
+        </nav>
+
+        @if (_isLoading)
+        {
+            <LoadingSpinner FullScreen="true"
+                            Label="Opening Destination Dossier..." />
+        }
+        else if (_errorMessage is not null)
+        {
+            <EmptyState Title="Dossier Loading Error"
+                        Message="@_errorMessage"
+                        ActionText="Retry"
+                        OnAction="LoadLocationAsync" />
+        }
+        else if (_location is null)
+        {
+            <EmptyState Title="Destination Not Found in Archive"
+                        Message="The requested filming destination does not match any verified site in our collection."
+                        ActionText="Return to Destinations Archive"
+                        ActionHref="@AppRoutes.Explore" />
+        }
+        else
+        {
+            <!-- SCENIC FULL-BLEED BANNER -->
+            <div class="scenic-banner">
+                <img src="@_location.ImageUrl" alt="@_location.Name" class="scenic-banner__image" />
+                <div class="scenic-banner__overlay"></div>
+            </div>
+
+            <!-- Destination Header: Frosted Glass Panel -->
+            <header class="location-header">
+                <div class="location-header__badge-row">
+                    <span class="cinema-badge cinema-badge--accent">VERIFIED DESTINATION</span>
+                    <span class="location-header__region-tag">@_location.Region.ToFriendlyString()</span>
+                </div>
+
+                <h1 class="location-header__title">@_location.Name</h1>
+
+                <div class="location-header__meta">
+                    <span class="location-header__place">@_location.DisplayPlace</span>
+                    <span class="location-header__divider" aria-hidden="true">•</span>
+                    <Chip Variant="outline" Label="@_location.Region.ToFriendlyString()" />
+                    <Chip Variant="muted" Label="@_location.Accessibility.ToFriendlyString()" />
+                    @if (_isStamped)
+                    {
+                        <Chip Variant="accent" Label="★ STAMPED IN PASSPORT" />
+                    }
+                </div>
+
+                <!-- Action Toolbar -->
+                <div class="location-header__actions">
+                    <AppButton Variant="@(_isInPilgrimage ? "secondary" : "primary")"
+                               OnClick="HandleTogglePilgrimage">
+                        @(_isInPilgrimage ? "✓ In Pilgrimage Route" : "+ Add to Pilgrimage Plan")
+                    </AppButton>
+
+                    <AppButton Variant="@(_isStamped ? "ghost" : "secondary")"
+                               OnClick="HandleStampPassport">
+                        @(_isStamped ? "✓ Digital Passport Stamped" : "★ Stamp Digital Passport")
+                    </AppButton>
+                </div>
+            </header>
+
+            <!-- Primary Section: Scene vs Reality Lens -->
+            <section class="location-scenes" aria-labelledby="scenes-heading">
+                <div class="location-scenes__header">
+                    <div>
+                        <span class="cinema-badge cinema-badge--accent">INTERACTIVE COMPARISON</span>
+                        <h2 id="scenes-heading" class="location-scenes__title">
+                            Scene vs. Reality Lens
+                        </h2>
+                    </div>
+
+                    @if (_location.Scenes.Count > 1)
+                    {
+                        <div class="scene-tabs" role="tablist" aria-label="Select film scene">
+                            @for (var i = 0; i < _location.Scenes.Count; i++)
+                            {
+                                var index = i;
+                                var scene = _location.Scenes[index];
+                                var isSelected = index == _selectedSceneIndex;
+                                <button type="button"
+                                        role="tab"
+                                        aria-selected="@isSelected"
+                                        class="scene-tab @(isSelected ? "scene-tab--active" : "")"
+                                        @onclick="() => _selectedSceneIndex = index">
+                                    Scene @(index + 1): @scene.Title
+                                </button>
+                            }
+                        </div>
+                    }
+                </div>
+
+                @if (_currentScene is not null)
+                {
+                    <div class="scene-viewer">
+                        <div class="scene-viewer__slider-box">
+                            <SceneComparisonSlider @key="_currentScene.Title"
+                                                   Scene="_currentScene"
+                                                   InitialPosition="50" />
+                        </div>
+
+                        <div class="scene-viewer__details">
+                            <div class="scene-viewer__meta-row">
+                                @if (_associatedProduction is not null)
+                                {
+                                    <a href="@AppRoutes.Production(_associatedProduction.Id)" class="production-link">
+                                        Featured in <strong>@_associatedProduction.Title</strong> (@_associatedProduction.ReleaseYear) →
+                                    </a>
+                                }
+                            </div>
+
+                            <h3 class="scene-viewer__scene-title">@_currentScene.Title</h3>
+                            <p class="scene-viewer__scene-desc">@_currentScene.SceneDescription</p>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="scene-viewer__no-scenes">
+                        <img src="@_location.ImageUrl" alt="@_location.Name" class="scene-viewer__hero-img" />
+                    </div>
+                }
+            </section>
+
+            <!-- Dossier Grid: Background & Practical Transit Guide -->
+            <div class="dossier-grid">
+                <!-- Background & Film History -->
+                <section class="dossier-card" aria-labelledby="desc-heading">
+                    <div class="dossier-card__header">
+                        <span class="dossier-card__tag">CINEMATIC CANON</span>
+                    </div>
+                    <h2 id="desc-heading" class="dossier-card__title">Site Background & Film History</h2>
+                    <p class="dossier-card__text">@_location.Description</p>
+                </section>
+
+                <!-- Practical Transit Guide -->
+                <section class="dossier-card" aria-labelledby="transit-heading">
+                    <div class="dossier-card__header">
+                        <span class="dossier-card__tag">TRAVEL & ACCESS</span>
+                    </div>
+                    <h2 id="transit-heading" class="dossier-card__title">Transit & Access Information</h2>
+                    <p class="dossier-card__text">@_location.PracticalTips</p>
+
+                    <div class="transit-meta">
+                        <div class="transit-meta__item">
+                            <span class="transit-meta__label">TERRAIN DIFFICULTY</span>
+                            <span class="transit-meta__value">@_location.Accessibility.ToFriendlyString()</span>
+                        </div>
+                        <div class="transit-meta__item">
+                            <span class="transit-meta__label">REGIONAL ZONE</span>
+                            <span class="transit-meta__value">@_location.Region.ToFriendlyString()</span>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Passport Stamp Confirmation Modal -->
+<Modal @bind-IsOpen="_showStampModal"
+       Title="Digital Passport Stamped"
+       Size="sm">
+    <ChildContent>
+        <div class="stamp-modal-content">
+            <div class="stamp-modal-icon" aria-hidden="true">★</div>
+            <h3 class="stamp-modal-title">Verification Recorded</h3>
+            <p class="stamp-modal-text">
+                Your presence at <strong>@_location?.Name</strong> (@_location?.DisplayPlace) has been permanently stamped into your field passport.
+            </p>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <AppButton Variant="secondary" Size="sm" OnClick="() => _showStampModal = false">
+            Close
+        </AppButton>
+        <AppButton Variant="primary" Size="sm" Href="@AppRoutes.Passport">
+            View Field Passport →
+        </AppButton>
+    </FooterContent>
+</Modal>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private FilmingLocation? _location;
+    private Production? _associatedProduction;
+    private int _selectedSceneIndex;
+    private bool _isInPilgrimage;
+    private bool _isStamped;
+    private bool _showStampModal;
+
+    private Scene? _currentScene =>
+        _location is not null && _location.Scenes.Count > _selectedSceneIndex
+            ? _location.Scenes[_selectedSceneIndex]
+            : _location?.Scenes.FirstOrDefault();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadLocationAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        Pilgrimage.OnChange += HandleStateChanged;
+        PassportService.OnPassportChanged += HandleStateChanged;
+    }
+
+    private async Task LoadLocationAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            _location = await LocationService.GetByIdAsync(Id);
+            _selectedSceneIndex = 0;
+
+            if (_location is not null)
+            {
+                _isInPilgrimage = Pilgrimage.Current.ContainsLocation(_location.Id);
+                _isStamped = await PassportService.HasStampAsync(_location.Id);
+
+                var firstProdId = _location.Scenes.FirstOrDefault()?.ProductionId;
+                if (!string.IsNullOrEmpty(firstProdId))
+                {
+                    _associatedProduction = await ProductionService.GetByIdAsync(firstProdId);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to read location dossier: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void HandleStateChanged()
+    {
+        if (_location is not null)
+        {
+            _isInPilgrimage = Pilgrimage.Current.ContainsLocation(_location.Id);
+        }
+        StateHasChanged();
+    }
+
+    private async Task HandleTogglePilgrimage()
+    {
+        if (_location is null) return;
+
+        if (_isInPilgrimage)
+        {
+            await Pilgrimage.RemoveStopAsync(_location.Id);
+        }
+        else
+        {
+            await Pilgrimage.AddStopAsync(_location);
+        }
+    }
+
+    private async Task HandleStampPassport()
+    {
+        if (_location is null) return;
+
+        await PassportService.CollectStampAsync(
+            _location.Id,
+            _location.Name,
+            _location.Country,
+            "archival-seal");
+
+        _isStamped = true;
+        _showStampModal = true;
+    }
+
+    public void Dispose()
+    {
+        Pilgrimage.OnChange -= HandleStateChanged;
+        PassportService.OnPassportChanged -= HandleStateChanged;
+    }
+}

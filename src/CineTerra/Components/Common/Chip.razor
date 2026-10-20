@@ -1,0 +1,66 @@
+@namespace CineTerra.Components.Common
+
+@if (CanClick)
+{
+    <button type="button"
+            class="@ComputedClass"
+            aria-pressed="@(IsActive ? "true" : "false")"
+            aria-label="@ComputedAriaLabel"
+            @onclick="HandleClick"
+            @attributes="AdditionalAttributes">
+        <span class="cinema-chip__content">
+            @if (ChildContent is not null)
+            {
+                @ChildContent
+            }
+            else
+            {
+                @Label
+            }
+        </span>
+        @if (CanRemove)
+        {
+            <span role="button"
+                  tabindex="0"
+                  class="cinema-chip__remove"
+                  aria-label="Remove"
+                  @onclick="HandleRemove"
+                  @onclick:stopPropagation="true">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.75">
+                    <line x1="2" y1="2" x2="8" y2="8" />
+                    <line x1="8" y1="2" x2="2" y2="8" />
+                </svg>
+            </span>
+        }
+    </button>
+}
+else
+{
+    <span class="@ComputedClass"
+          aria-label="@ComputedAriaLabel"
+          @attributes="AdditionalAttributes">
+        <span class="cinema-chip__content">
+            @if (ChildContent is not null)
+            {
+                @ChildContent
+            }
+            else
+            {
+                @Label
+            }
+        </span>
+        @if (CanRemove)
+        {
+            <button type="button"
+                    class="cinema-chip__remove"
+                    aria-label="Remove"
+                    @onclick="HandleRemove"
+                    @onclick:stopPropagation="true">
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" stroke-width="1.75">
+                    <line x1="2" y1="2" x2="8" y2="8" />
+                    <line x1="8" y1="2" x2="2" y2="8" />
+                </svg>
+            </button>
+        }
+    </span>
+}

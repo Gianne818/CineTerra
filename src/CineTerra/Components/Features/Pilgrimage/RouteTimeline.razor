@@ -1,0 +1,96 @@
+@namespace CineTerra.Components.Features.Pilgrimage
+
+<div class="route-timeline">
+    @if (!Pilgrimage.HasStops)
+    {
+        <div class="route-timeline__empty">
+            <span class="route-timeline__empty-icon" aria-hidden="true">🗺</span>
+            <h4 class="route-timeline__empty-title">Route Unplotted</h4>
+            <p class="route-timeline__empty-text">
+                Add filming destinations from the explore index or scene viewer to map your travel journey.
+            </p>
+        </div>
+    }
+    else
+    {
+        <!-- Summary header -->
+        <div class="route-timeline__summary">
+            <div class="route-timeline__title-wrap">
+                <span class="route-timeline__badge">EXPEDITION ITINERARY</span>
+                <h3 class="route-timeline__name">@Pilgrimage.Name</h3>
+            </div>
+            
+            <div class="route-timeline__stats">
+                <div class="route-timeline__stat">
+                    <span class="route-timeline__stat-label">TOTAL TIME</span>
+                    <span class="route-timeline__stat-value">
+                        @Pilgrimage.TotalDays @(Pilgrimage.TotalDays == 1 ? "Day" : "Days")
+                    </span>
+                </div>
+                <div class="route-timeline__stat-divider"></div>
+                <div class="route-timeline__stat">
+                    <span class="route-timeline__stat-label">DESTINATIONS</span>
+                    <span class="route-timeline__stat-value">
+                        @Pilgrimage.Stops.Count / @Pilgrimage.MaxStops
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Connected vertical track -->
+        <div class="route-timeline__track">
+            @for (var i = 0; i < Pilgrimage.Stops.Count; i++)
+            {
+                var stop = Pilgrimage.Stops[i];
+                var isFirst = i == 0;
+                var isLast = i == Pilgrimage.Stops.Count - 1;
+                var stopNumber = i + 1;
+
+                <div class="timeline-node @(isFirst ? "timeline-node--first" : "") @(isLast ? "timeline-node--last" : "")"
+                     @key="stop.LocationId">
+
+                    <!-- Rail & Node marker -->
+                    <div class="timeline-node__rail">
+                        <div class="timeline-node__marker">
+                            <span class="timeline-node__num">@(stopNumber)</span>
+                        </div>
+                        @if (!isLast)
+                        {
+                            <div class="timeline-node__line">
+                                <span class="timeline-node__line-badge">
+                                    @stop.Days @(stop.Days == 1 ? "day" : "days")
+                                </span>
+                            </div>
+                        }
+                    </div>
+
+                    <!-- Node Content -->
+                    <div class="timeline-node__content">
+                        <div class="timeline-node__header">
+                            <span class="timeline-node__tag">
+                                @(isFirst ? "EXPEDITION ORIGIN" : isLast ? "FINAL DESTINATION" : $"STOP {stopNumber}")
+                            </span>
+                            <span class="timeline-node__days">
+                                @stop.Days @(stop.Days == 1 ? "day allocated" : "days allocated")
+                            </span>
+                        </div>
+
+                        <h4 class="timeline-node__title">@stop.LocationName</h4>
+                        <p class="timeline-node__place">@stop.DisplayPlace</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Terminal milestone banner -->
+            <div class="timeline-terminal">
+                <div class="timeline-terminal__dot">✓</div>
+                <span class="timeline-terminal__text">Complete Pilgrimage Trail</span>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public Pilgrimage Pilgrimage { get; set; } = default!;
+}

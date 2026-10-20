@@ -1,0 +1,158 @@
+@page "/productions"
+@namespace CineTerra.Pages
+@inject IProductionService ProductionService
+@inject NavigationManager Navigation
+
+<PageTitle>Film & Anime Canon · CineTerra</PageTitle>
+
+<div class="productions-page">
+    <div class="productions-page__inner">
+        <!-- Header -->
+        <header class="productions-header">
+            <div class="productions-header__meta">
+                <span class="cinema-badge cinema-badge--accent">CINEMATIC CANON</span>
+                <span class="productions-header__count">
+                    @(_allProductions.Count) TITLES ARCHIVED
+                </span>
+            </div>
+
+            <h1 class="productions-header__title">
+                Film & Anime Canon
+            </h1>
+
+            <p class="productions-header__lead">
+                The master catalog of motion pictures, television epics, and anime masterworks whose visual landscapes are grounded in real-world geography.
+            </p>
+        </header>
+
+        <!-- 4 UI States -->
+        @if (_isLoading)
+        {
+            <LoadingSpinner FullScreen="true"
+                            Label="Loading Film & Anime Canon..." />
+        }
+        else if (_errorMessage is not null)
+        {
+            <EmptyState Title="Canon Load Failure"
+                        Message="@_errorMessage"
+                        ActionText="Retry Query"
+                        OnAction="LoadProductionsAsync" />
+        }
+        else
+        {
+            <!-- Category Filter Tabs -->
+            <section class="category-tabs" role="tablist" aria-label="Filter canon by production category">
+                <button type="button"
+                        role="tab"
+                        aria-selected="@(!_selectedType.HasValue)"
+                        class="tab-btn @(!_selectedType.HasValue ? "tab-btn--active" : "")"
+                        @onclick="() => FilterByCategory(null)">
+                    All Titles (@_allProductions.Count)
+                </button>
+
+                <button type="button"
+                        role="tab"
+                        aria-selected="@(_selectedType == ProductionType.Film)"
+                        class="tab-btn @(_selectedType == ProductionType.Film ? "tab-btn--active" : "")"
+                        @onclick="() => FilterByCategory(ProductionType.Film)">
+                    Feature Films (@CountByType(ProductionType.Film))
+                </button>
+
+                <button type="button"
+                        role="tab"
+                        aria-selected="@(_selectedType == ProductionType.Anime)"
+                        class="tab-btn @(_selectedType == ProductionType.Anime ? "tab-btn--active" : "")"
+                        @onclick="() => FilterByCategory(ProductionType.Anime)">
+                    Anime Masterworks (@CountByType(ProductionType.Anime))
+                </button>
+
+                <button type="button"
+                        role="tab"
+                        aria-selected="@(_selectedType == ProductionType.Series)"
+                        class="tab-btn @(_selectedType == ProductionType.Series ? "tab-btn--active" : "")"
+                        @onclick="() => FilterByCategory(ProductionType.Series)">
+                    Television Series (@CountByType(ProductionType.Series))
+                </button>
+            </section>
+
+            @if (_filteredProductions.Count == 0)
+            {
+                <EmptyState Title="No titles found in this category"
+                            Message="No cinematic titles are registered in this specific category yet."
+                            ActionText="Show All Titles"
+                            OnAction="() => FilterByCategory(null)" />
+            }
+            else
+            {
+                <!-- Responsive Grid of Production Cards -->
+                <section class="productions-grid" aria-label="Productions grid">
+                    @foreach (var prod in _filteredProductions)
+                    {
+                        <ProductionCard @key="prod.Id"
+                                        Production="prod"
+                                        OnSelected="HandleProductionSelected" />
+                    }
+                </section>
+            }
+        }
+    </div>
+</div>
+
+@code {
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private IReadOnlyList<Production> _allProductions = [];
+    private List<Production> _filteredProductions = [];
+    private ProductionType? _selectedType;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProductionsAsync();
+    }
+
+    private async Task LoadProductionsAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            _allProductions = await ProductionService.GetAllAsync();
+            ApplyFilter();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to load titles from archive: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void FilterByCategory(ProductionType? type)
+    {
+        _selectedType = type;
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        if (_selectedType.HasValue)
+        {
+            _filteredProductions = _allProductions.Where(p => p.Type == _selectedType.Value).ToList();
+        }
+        else
+        {
+            _filteredProductions = _allProductions.ToList();
+        }
+    }
+
+    private int CountByType(ProductionType type) =>
+        _allProductions.Count(p => p.Type == type);
+
+    private void HandleProductionSelected(Production prod)
+    {
+        Navigation.NavigateTo(AppRoutes.Production(prod.Id));
+    }
+}

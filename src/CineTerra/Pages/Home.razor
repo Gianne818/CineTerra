@@ -1,0 +1,381 @@
+@page "/"
+@inject ILocationService LocationService
+@inject IProductionService ProductionService
+@inject PilgrimageState Pilgrimage
+@inject NavigationManager Navigation
+@inject IJSRuntime JS
+@implements IAsyncDisposable
+
+<PageTitle>CineTerra — Immersive Scenic Film Expeditions</PageTitle>
+
+@if (_isLoading)
+{
+    <div class="cinema-loading-hero">
+        <LoadingSpinner Size="lg" Label="Opening scenic film journeys..." />
+    </div>
+}
+else
+{
+    <!-- FIXED FULL-BLEED SCENERY CONTAINER (Cross-dissolves as user scrolls) -->
+    <div class="scenery-fixed-backdrop" aria-hidden="true">
+        @for (int i = 0; i < _chapters.Count; i++)
+        {
+            var chap = _chapters[i];
+            var isActive = i == _activeChapterIndex;
+            <div class="stage-backdrop @(isActive ? "stage-backdrop--active" : "")"
+                 style="background-image: url('@chap.ImageUrl');">
+            </div>
+        }
+        <!-- Ambient light atmosphere overlays -->
+        <div class="stage-overlay stage-overlay--top"></div>
+        <div class="stage-overlay stage-overlay--ambient"></div>
+        <div class="stage-overlay stage-overlay--bottom"></div>
+    </div>
+
+    <!-- FLOATING CHAPTER PROGRESS DOCK (Always visible, shows active scenery & allows 1-click jump) -->
+    <aside class="scenery-floating-dock glass-panel" aria-label="Scenic Chapters Progress">
+        <div class="scenery-dock-header">
+            <span class="scenery-dock-label">SCENIC EXPEDITION</span>
+            <span class="scenery-dock-count">0@(_activeChapterIndex + 1) / 0@(_chapters.Count)</span>
+        </div>
+        <nav class="scenery-dock-nav">
+            @for (int i = 0; i < _chapters.Count; i++)
+            {
+                var index = i;
+                var chap = _chapters[index];
+                var isActive = index == _activeChapterIndex;
+                <button type="button"
+                        class="scenery-dock-dot @(isActive ? "scenery-dock-dot--active" : "")"
+                        @onclick="() => JumpToChapter(index)"
+                        title="@chap.ChapterTag: @chap.FilmTitle — @chap.LocationName"
+                        aria-label="Jump to @chap.LocationName">
+                    <span class="scenery-dock-dot__bullet"></span>
+                    <span class="scenery-dock-dot__text">
+                        <span class="scenery-dock-dot__film">@chap.FilmTitle</span>
+                        <span class="scenery-dock-dot__place">@chap.ShortPlace</span>
+                    </span>
+                </button>
+            }
+        </nav>
+        <button type="button" class="scenery-dock-theater-jump" @onclick="ScrollToTheater">
+            <span>⇄ Comparison Lens</span>
+        </button>
+    </aside>
+
+    <!-- SCROLL TRACK: 5 SCENIC CHAPTERS -->
+    <div class="scenery-scroll-track">
+        @for (int i = 0; i < _chapters.Count; i++)
+        {
+            var chap = _chapters[i];
+            var index = i;
+            var isAdded = Pilgrimage.Current.ContainsLocation(chap.LocationId);
+
+            <section class="scenery-scroll-section scenery-scroll-section--@(chap.Alignment)"
+                     id="scenery-chapter-@index"
+                     data-chapter-index="@index"
+                     aria-label="@chap.ChapterTag: @chap.LocationName">
+
+                <!-- FLOATING WHITE FROSTED GLASS STORY CARD -->
+                <article class="scenery-story-card">
+                    <!-- Chapter Badge -->
+                    <div class="scenery-card-badge-row">
+                        <span class="scenery-card-chapter-pill">@chap.ChapterTag</span>
+                        <span class="scenery-card-film-pill">@chap.FilmTitle</span>
+                    </div>
+
+                    <!-- Landmark Title & Destination -->
+                    <h2 class="scenery-card-title">@chap.LocationName</h2>
+                    <p class="scenery-card-place">@chap.FullPlace</p>
+
+                    <!-- Evocative Film Narrative -->
+                    <p class="scenery-card-narrative">@chap.Narrative</p>
+
+                    <!-- Action Toolbar -->
+                    <div class="scenery-card-actions">
+                        <AppButton Variant="primary"
+                                   Size="md"
+                                   OnClick="() => NavigateToLocation(chap.LocationId)">
+                            Explore Destination
+                        </AppButton>
+
+                        <button type="button"
+                                class="scenery-card-pilgrimage-btn @(isAdded ? "scenery-card-pilgrimage-btn--added" : "")"
+                                @onclick="() => TogglePilgrimage(chap.LocationId)">
+                            @if (isAdded)
+                            {
+                                <span>✓ Added to Itinerary</span>
+                            }
+                            else
+                            {
+                                <span>+ Add to Pilgrimage</span>
+                            }
+                        </button>
+
+                        <button type="button"
+                                class="scenery-card-lens-btn"
+                                @onclick="() => OpenSceneComparison(chap.LocationId)">
+                            Wipe Scene vs Reality →
+                        </button>
+                    </div>
+
+                    <!-- Scroll Hint (for first chapters) -->
+                    @if (index < _chapters.Count - 1)
+                    {
+                        <div class="scenery-card-scroll-hint" @onclick="() => JumpToChapter(index + 1)">
+                            <span>Scroll to explore next vista</span>
+                            <span class="scenery-scroll-arrow">↓</span>
+                        </div>
+                    }
+                </article>
+            </section>
+        }
+    </div>
+
+    <!-- SECTION: SCENE VS REALITY COMPARISON THEATER -->
+    <section class="theater-section" id="comparison-theater">
+        <div class="theater-inner">
+            <div class="section-badge-wrap">
+                <span class="cinema-badge cinema-badge--accent">THE OPTICAL LENS</span>
+            </div>
+            <h2 class="theater-heading">The Screen and the Earth</h2>
+            <p class="theater-sub">
+                Drag the interactive viewfinder to wipe between the graded movie frame and the raw real-world terrain.
+            </p>
+
+            @if (_currentFlagshipScene != null)
+            {
+                <div class="theater-slider-wrap">
+                    <SceneComparisonSlider Scene="_currentFlagshipScene" />
+                </div>
+            }
+
+            <div class="scene-selector-pills">
+                <span class="selector-label">SELECT FILM SCENE:</span>
+                @foreach (var chap in _chapters)
+                {
+                    var loc = _allLocations.FirstOrDefault(l => l.Id == chap.LocationId);
+                    var scene = loc?.Scenes.FirstOrDefault();
+                    if (scene != null)
+                    {
+                        var isCurrent = _currentFlagshipScene?.Title == scene.Title;
+                        <button type="button"
+                                class="scene-pill @(isCurrent ? "scene-pill--active" : "")"
+                                @onclick="() => _currentFlagshipScene = scene">
+                            <strong>@chap.FilmTitle</strong> · @scene.Title
+                        </button>
+                    }
+                }
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION: EXPEDITION ROADMAP -->
+    <section class="journey-section">
+        <div class="journey-inner">
+            <div class="section-badge-wrap">
+                <span class="cinema-badge">PILGRIMAGE ROADMAP</span>
+            </div>
+            <h2 class="journey-heading">From Screen to Summit</h2>
+            <p class="journey-sub">How film enthusiasts turn iconic watchlists into walkable worldwide journeys.</p>
+
+            <div class="journey-grid">
+                <div class="journey-card glass-panel">
+                    <span class="journey-num">01</span>
+                    <h3>Select Canon Title</h3>
+                    <p>Explore verified filming destinations across Studio Ghibli, Makoto Shinkai anime, Peter Jackson epics, and Denis Villeneuve masterworks.</p>
+                </div>
+                <div class="journey-card glass-panel">
+                    <span class="journey-num">02</span>
+                    <h3>Chart Scenic Route</h3>
+                    <p>Map real-world terrain, camera viewpoints, local rail connections, and scenic walking approaches without robotic clutter.</p>
+                </div>
+                <div class="journey-card glass-panel">
+                    <span class="journey-num">03</span>
+                    <h3>Stamp Your Passport</h3>
+                    <p>Record your physical visits with digital passport stamps and craft your personalized cinema pilgrimage itinerary.</p>
+                </div>
+            </div>
+
+            <div class="journey-cta">
+                <AppButton Variant="primary"
+                           Size="lg"
+                           OnClick="() => Navigation.NavigateTo(AppRoutes.Explore)">
+                    Explore All Destinations
+                </AppButton>
+                <AppButton Variant="secondary"
+                           Size="lg"
+                           OnClick="() => Navigation.NavigateTo(AppRoutes.Pilgrimage)">
+                    Open Route Planner
+                </AppButton>
+            </div>
+        </div>
+    </section>
+}
+
+@code {
+    private bool _isLoading = true;
+    private int _activeChapterIndex = 0;
+    private DotNetObjectReference<Home>? _dotNetRef;
+    private IReadOnlyList<FilmingLocation> _allLocations = [];
+    private Scene? _currentFlagshipScene;
+
+    private record ScenicChapter(
+        string LocationId,
+        string ChapterTag,
+        string FilmTitle,
+        string LocationName,
+        string ShortPlace,
+        string FullPlace,
+        string Narrative,
+        string ImageUrl,
+        string Alignment
+    );
+
+    private readonly List<ScenicChapter> _chapters =
+    [
+        new ScenicChapter(
+            LocationId: "bungo-mori-roundhouse",
+            ChapterTag: "Chapter 01",
+            FilmTitle: "Suzume",
+            LocationName: "Former Bungo-Mori Locomotive Depot",
+            ShortPlace: "Oita, Japan",
+            FullPlace: "Kusu, Oita Prefecture, Japan",
+            Narrative: "Built in 1934, this fan-shaped railway roundhouse served as the real-world visual model for the forgotten onsen ruins where Suzume first encounters Souta. Here, among the weathered concrete turntable bays, stood the freestanding mythical door holding back the spectral earthquake worm.",
+            ImageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=1600&q=85",
+            Alignment: "left"
+        ),
+        new ScenicChapter(
+            LocationId: "wadi-rum-valley",
+            ChapterTag: "Chapter 02",
+            FilmTitle: "Dune",
+            LocationName: "Wadi Rum Protected Area",
+            ShortPlace: "Wadi Rum, Jordan",
+            FullPlace: "Aqaba Governorate, Jordan",
+            Narrative: "Known as the Valley of the Moon, this UNESCO World Heritage sandstone and granite desert expanse gave flesh to the hostile, sun-bleached planet of Arrakis in Denis Villeneuve's cinematic epic. Its sweeping dunes and sheer monoliths frame the legendary spice sands of the Fremen.",
+            ImageUrl: "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=1600&q=85",
+            Alignment: "right"
+        ),
+        new ScenicChapter(
+            LocationId: "matamata-hobbiton",
+            ChapterTag: "Chapter 03",
+            FilmTitle: "The Lord of the Rings",
+            LocationName: "Hobbiton Movie Set",
+            ShortPlace: "Matamata, New Zealand",
+            FullPlace: "Matamata, Waikato, New Zealand",
+            Narrative: "Spanning 12 lush acres of rolling sheep farm pastures, the permanent Shire set features 44 meticulously reconstructed hobbit holes, the thatch-roofed Green Dragon Inn, and the majestic Party Tree where Bilbo Baggins celebrated his eleventy-first birthday.",
+            ImageUrl: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&q=85",
+            Alignment: "left"
+        ),
+        new ScenicChapter(
+            LocationId: "skellig-michael",
+            ChapterTag: "Chapter 04",
+            FilmTitle: "Star Wars",
+            LocationName: "Skellig Michael (Sceilg Mhichíl)",
+            ShortPlace: "Kerry, Ireland",
+            FullPlace: "County Kerry, Ireland",
+            Narrative: "Rising dramatically out of the wild Atlantic swells, this ancient monastic sea crag was chosen to embody Ahch-To, the secluded sanctuary of the original Jedi Temple. Rey climbed its 618 weathered stone steps to present Luke Skywalker with his lost lightsaber.",
+            ImageUrl: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=85",
+            Alignment: "right"
+        ),
+        new ScenicChapter(
+            LocationId: "suga-shrine-stairs",
+            ChapterTag: "Chapter 05",
+            FilmTitle: "Your Name",
+            LocationName: "Suga Shrine Red Stairs",
+            ShortPlace: "Tokyo, Japan",
+            FullPlace: "Yotsuya, Shinjuku, Tokyo, Japan",
+            Narrative: "Tucked inside a tranquil residential neighborhood in central Tokyo, these steep stone steps with crimson lacquered iron balustrades formed the climactic scene of Makoto Shinkai's animated masterpiece, where Taki and Mitsuha finally turn and ask each other's name.",
+            ImageUrl: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1600&q=85",
+            Alignment: "center"
+        )
+    ];
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            _allLocations = await LocationService.GetAllAsync();
+            var bungo = _allLocations.FirstOrDefault(l => l.Id == "bungo-mori-roundhouse");
+            _currentFlagshipScene = bungo?.Scenes.FirstOrDefault() ?? _allLocations.FirstOrDefault(l => l.HasScenes)?.Scenes.FirstOrDefault();
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && !_isLoading)
+        {
+            _dotNetRef = DotNetObjectReference.Create(this);
+            await JS.InvokeVoidAsync("cineterra.initSceneryScroll", _dotNetRef);
+        }
+    }
+
+    [JSInvokable]
+    public void OnChapterChanged(int index)
+    {
+        if (index >= 0 && index < _chapters.Count && index != _activeChapterIndex)
+        {
+            _activeChapterIndex = index;
+            StateHasChanged();
+        }
+    }
+
+    private async Task JumpToChapter(int index)
+    {
+        _activeChapterIndex = index;
+        await JS.InvokeVoidAsync("cineterra.jumpToChapter", index);
+    }
+
+    private async Task ScrollToTheater()
+    {
+        await JS.InvokeVoidAsync("cineterra.scrollToElement", "comparison-theater");
+    }
+
+    private async Task OpenSceneComparison(string locationId)
+    {
+        var loc = _allLocations.FirstOrDefault(l => l.Id == locationId);
+        var scene = loc?.Scenes.FirstOrDefault();
+        if (scene != null)
+        {
+            _currentFlagshipScene = scene;
+        }
+        await ScrollToTheater();
+    }
+
+    private void NavigateToLocation(string locationId)
+    {
+        Navigation.NavigateTo(AppRoutes.Location(locationId));
+    }
+
+    private async Task TogglePilgrimage(string locationId)
+    {
+        if (Pilgrimage.Current.ContainsLocation(locationId))
+        {
+            await Pilgrimage.RemoveStopAsync(locationId);
+        }
+        else
+        {
+            var loc = _allLocations.FirstOrDefault(l => l.Id == locationId);
+            if (loc != null)
+            {
+                await Pilgrimage.AddStopAsync(loc, 2);
+            }
+        }
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        try
+        {
+            await JS.InvokeVoidAsync("cineterra.disposeScrollScenery");
+        }
+        catch
+        {
+            // Ignore disposal errors when unloading
+        }
+        _dotNetRef?.Dispose();
+    }
+}

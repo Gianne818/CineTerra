@@ -1,0 +1,129 @@
+/* Productions.razor.css — Light Mode Canon Gallery */
+
+.productions-page {
+    background-color: var(--color-bg);
+    min-height: 100vh;
+    padding: 7rem var(--margin-page) 6rem;
+    position: relative;
+}
+
+.productions-page__inner {
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.25rem;
+}
+
+/* Header */
+.productions-header {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    border-radius: var(--radius-lg);
+    padding: 2.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.productions-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+}
+
+.productions-header__meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.productions-header__count {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--color-accent);
+    background: rgba(194, 91, 14, 0.1);
+    padding: 0.35rem 0.85rem;
+    border-radius: var(--radius-pill);
+    border: 1px solid rgba(194, 91, 14, 0.25);
+    font-weight: 700;
+}
+
+.productions-header__title {
+    font-family: var(--font-display);
+    font-size: var(--step-head);
+    font-weight: 800;
+    color: var(--color-ink);
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.productions-header__lead {
+    font-family: var(--font-body);
+    font-size: var(--step-body);
+    color: var(--color-ink-secondary);
+    line-height: 1.65;
+    max-width: 68ch;
+    margin: 0;
+}
+
+/* Category Filter Tabs */
+.category-tabs {
+    display: flex;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.tab-btn {
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    color: var(--color-ink-secondary);
+    padding: 0.55rem 1.25rem;
+    border-radius: var(--radius-pill);
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all var(--duration-fast) ease;
+}
+
+.tab-btn:hover {
+    color: var(--color-ink);
+    background: #f8fafc;
+    border-color: rgba(0, 0, 0, 0.2);
+}
+
+.tab-btn--active {
+    background: #fffbeb;
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(194, 91, 14, 0.15);
+}
+
+/* Grid */
+.productions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+}
+
+@media (max-width: 768px) {
+    .productions-header {
+        padding: 1.75rem;
+    }
+    .productions-grid {
+        grid-template-columns: 1fr;
+    }
+}

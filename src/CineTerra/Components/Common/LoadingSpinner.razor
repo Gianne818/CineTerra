@@ -1,0 +1,47 @@
+@namespace CineTerra.Components.Common
+
+<div class="@ComputedClass"
+     role="status"
+     aria-live="polite"
+     @attributes="AdditionalAttributes">
+
+    <div class="cinema-loader__visual">
+        <!-- Projector light beam glow -->
+        <div class="cinema-loader__beam" aria-hidden="true"></div>
+
+        <!-- Rotating 35mm projector reel -->
+        <svg class="cinema-loader__reel"
+             viewBox="0 0 48 48"
+             fill="none"
+             xmlns="http://www.w3.org/2000/svg"
+             aria-hidden="true">
+            <!-- Sprocket Track Rim -->
+            <circle cx="24" cy="24" r="22" stroke="currentColor" stroke-width="1.25" stroke-dasharray="3 2" class="cinema-loader__rim" />
+            <!-- Film Guide Ring -->
+            <circle cx="24" cy="24" r="18" stroke="currentColor" stroke-width="1" opacity="0.6" />
+            <!-- Inner Hub -->
+            <circle cx="24" cy="24" r="7" stroke="currentColor" stroke-width="1.2" opacity="0.8" />
+            <!-- Aperture Holes / Tri-spool -->
+            <circle cx="24" cy="11" r="3.2" fill="currentColor" opacity="0.4" />
+            <circle cx="12.7" cy="30.5" r="3.2" fill="currentColor" opacity="0.4" />
+            <circle cx="35.3" cy="30.5" r="3.2" fill="currentColor" opacity="0.4" />
+            <!-- Center Projector Light Core -->
+            <circle cx="24" cy="24" r="2.5" class="cinema-loader__core" />
+        </svg>
+    </div>
+
+    @if (ShowLabel && !string.IsNullOrWhiteSpace(Label))
+    {
+        <div class="cinema-loader__meta">
+            <span class="cinema-loader__label">@Label</span>
+            @if (!string.IsNullOrWhiteSpace(TelemetryText))
+            {
+                <span class="cinema-loader__telemetry">@TelemetryText</span>
+            }
+        </div>
+    }
+    else
+    {
+        <span class="sr-only">@(Label ?? "Loading...")</span>
+    }
+</div>

@@ -1,0 +1,290 @@
+@page "/pilgrimage"
+@namespace CineTerra.Pages
+@inject PilgrimageState Pilgrimage
+@inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<PageTitle>Pilgrimage Route Builder · CineTerra</PageTitle>
+
+<div class="pilgrimage-page">
+    <div class="pilgrimage-page__inner">
+        <!-- Header -->
+        <header class="pilgrimage-header">
+            <div class="pilgrimage-header__meta">
+                <span class="cinema-badge cinema-badge--accent">EXPEDITION PLANNER</span>
+                <span class="pilgrimage-header__status">
+                    @(Pilgrimage.Current.HasStops ? $"{Pilgrimage.Current.Stops.Count} DESTINATIONS PLANNED" : "UNPLANNED")
+                </span>
+            </div>
+
+            <!-- Editable Pilgrimage Name -->
+            <div class="pilgrimage-name-box">
+                <input type="text"
+                       class="pilgrimage-name-input"
+                       value="@_itineraryName"
+                       @oninput="HandleNameInput"
+                       @onblur="HandleNameBlur"
+                       aria-label="Pilgrimage expedition name"
+                       placeholder="Name your cinematic expedition..." />
+                <span class="pilgrimage-name-hint" aria-hidden="true">✎ Click to rename expedition</span>
+            </div>
+
+            <p class="pilgrimage-header__lead">
+                Plan your real-world pilgrimage journey across verified filming destinations. Adjust stay durations, reorder expedition waypoints, and inspect your travel timeline.
+            </p>
+        </header>
+
+        @if (!Pilgrimage.Current.HasStops)
+        {
+            <!-- 0 Stops Empty State -->
+            <EmptyState Title="No Destinations in Itinerary"
+                        Message="Your cinematic pilgrimage route is currently unplotted. Explore our verified destinations archive to select filming locations and chart your journey."
+                        ActionText="Browse Filming Destinations"
+                        ActionHref="@AppRoutes.Explore" />
+        }
+        else
+        {
+            <!-- Metrics Summary Bar -->
+            <section class="metrics-bar" aria-label="Expedition metrics">
+                <div class="metric-card">
+                    <span class="metric-card__label">TOTAL STOPS</span>
+                    <span class="metric-card__value">
+                        @Pilgrimage.Current.Stops.Count
+                        <small>/ @CineTerra.Models.Pilgrimages.Pilgrimage.MaxStops</small>
+                    </span>
+                    <span class="metric-card__sub">
+                        @(Pilgrimage.Current.IsFull ? "Route capacity reached" : $"{CineTerra.Models.Pilgrimages.Pilgrimage.MaxStops - Pilgrimage.Current.Stops.Count} slots available")
+                    </span>
+                </div>
+
+                <div class="metric-card">
+                    <span class="metric-card__label">TRAVEL DURATION</span>
+                    <span class="metric-card__value">
+                        @Pilgrimage.Current.TotalDays
+                        <small>DAYS</small>
+                    </span>
+                    <span class="metric-card__sub">Total days across all waypoints</span>
+                </div>
+
+                <div class="metric-card">
+                    <span class="metric-card__label">EXPEDITION SPAN</span>
+                    <span class="metric-card__value">
+                        @CalculateUniqueCountries()
+                        <small>REGIONS</small>
+                    </span>
+                    <span class="metric-card__sub">Distinct geographic destinations</span>
+                </div>
+            </section>
+
+            <!-- Action Toolbar -->
+            <section class="itinerary-actions" aria-label="Itinerary controls">
+                <div class="itinerary-actions__left">
+                    <AppButton Variant="primary" Size="sm" Href="@AppRoutes.Explore">
+                        + Add Destinations
+                    </AppButton>
+                    <AppButton Variant="secondary" Size="sm" OnClick="() => _showCallSheetModal = true">
+                        ⎙ View Run Sheet & Export
+                    </AppButton>
+                </div>
+
+                <div class="itinerary-actions__right">
+                    <AppButton Variant="danger" Size="sm" OnClick="() => _showClearModal = true">
+                        ✕ Clear Itinerary
+                    </AppButton>
+                </div>
+            </section>
+
+            <!-- Main Workspace: Stops List & Timeline Track -->
+            <div class="pilgrimage-workspace">
+                <!-- Left: List of Stops with reordering & day steppers -->
+                <section class="stops-column" aria-label="Expedition stops list">
+                    <div class="column-header">
+                        <h2 class="column-title">Expedition Stops (@Pilgrimage.Current.Stops.Count)</h2>
+                        <span class="column-hint">Use ▲ / ▼ to reorder waypoints</span>
+                    </div>
+
+                    <div class="stops-list">
+                        @for (var i = 0; i < Pilgrimage.Current.Stops.Count; i++)
+                        {
+                            var index = i;
+                            var stop = Pilgrimage.Current.Stops[index];
+                            <StopItem @key="stop.LocationId"
+                                      Stop="stop"
+                                      Index="index"
+                                      CanMoveUp="index > 0"
+                                      CanMoveDown="index < Pilgrimage.Current.Stops.Count - 1"
+                                      OnMove="HandleMoveStop"
+                                      OnDaysChanged="HandleDaysChanged"
+                                      OnRemove="HandleRemoveStop" />
+                        }
+                    </div>
+                </section>
+
+                <!-- Right: Route Timeline Component -->
+                <section class="timeline-column" aria-label="Route timeline visual track">
+                    <RouteTimeline Pilgrimage="@Pilgrimage.Current" />
+                </section>
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Clear Confirmation Modal -->
+<Modal @bind-IsOpen="_showClearModal"
+       Title="Clear Pilgrimage Itinerary?"
+       Size="sm">
+    <ChildContent>
+        <p class="modal-msg">
+            Are you sure you want to remove all <strong>@Pilgrimage.Current.Stops.Count waypoints</strong> from <strong>@Pilgrimage.Current.Name</strong>? This action cannot be undone.
+        </p>
+    </ChildContent>
+    <FooterContent>
+        <AppButton Variant="secondary" Size="sm" OnClick="() => _showClearModal = false">
+            Cancel
+        </AppButton>
+        <AppButton Variant="danger" Size="sm" OnClick="HandleConfirmClear">
+            Yes, Clear Route
+        </AppButton>
+    </FooterContent>
+</Modal>
+
+<!-- Call Sheet / Export Modal -->
+<Modal @bind-IsOpen="_showCallSheetModal"
+       Title="Expedition Run Sheet"
+       Size="lg">
+    <ChildContent>
+        <div class="call-sheet">
+            <div class="call-sheet__header">
+                <div class="call-sheet__title-wrap">
+                    <span class="call-sheet__badge">OFFICIAL CINETERRAL PILGRIMAGE RUN SHEET</span>
+                    <h3 class="call-sheet__name">@Pilgrimage.Current.Name</h3>
+                </div>
+                <div class="call-sheet__meta">
+                    <span>DATE: @DateTime.UtcNow.ToString("yyyy-MM-dd")</span>
+                    <span>DURATION: @Pilgrimage.Current.TotalDays DAYS</span>
+                    <span>STOPS: @Pilgrimage.Current.Stops.Count</span>
+                </div>
+            </div>
+
+            <table class="call-sheet__table">
+                <thead>
+                    <tr>
+                        <th scope="col">STOP</th>
+                        <th scope="col">FILMING LOCATION</th>
+                        <th scope="col">REGION / PLACE</th>
+                        <th scope="col">SCHEDULED DAYS</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (var i = 0; i < Pilgrimage.Current.Stops.Count; i++)
+                    {
+                        var stop = Pilgrimage.Current.Stops[i];
+                        <tr>
+                            <td class="table-index">@($"{(i + 1):D2}")</td>
+                            <td><strong>@stop.LocationName</strong></td>
+                            <td>@stop.DisplayPlace</td>
+                            <td class="table-days">@stop.Days @(stop.Days == 1 ? "day" : "days")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+
+            <div class="call-sheet__footer-note">
+                <p>
+                    Verify local transportation timetables and access guidelines prior to departure. Adhere strictly to leave-no-trace principles at all filming destinations.
+                </p>
+            </div>
+        </div>
+    </ChildContent>
+    <FooterContent>
+        <AppButton Variant="secondary" Size="sm" OnClick="() => _showCallSheetModal = false">
+            Close
+        </AppButton>
+        <AppButton Variant="primary" Size="sm" OnClick="HandlePrintCallSheet">
+            Print Run Sheet
+        </AppButton>
+    </FooterContent>
+</Modal>
+
+@code {
+    private string _itineraryName = string.Empty;
+    private bool _showClearModal;
+    private bool _showCallSheetModal;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Pilgrimage.OnChange += HandleStateChanged;
+        await Pilgrimage.InitializeAsync();
+        _itineraryName = Pilgrimage.Current.Name;
+    }
+
+    private void HandleStateChanged()
+    {
+        _itineraryName = Pilgrimage.Current.Name;
+        StateHasChanged();
+    }
+
+    private void HandleNameInput(ChangeEventArgs e)
+    {
+        _itineraryName = e.Value?.ToString() ?? string.Empty;
+    }
+
+    private async Task HandleNameBlur()
+    {
+        if (!string.IsNullOrWhiteSpace(_itineraryName))
+        {
+            await Pilgrimage.RenameAsync(_itineraryName);
+        }
+        else
+        {
+            _itineraryName = Pilgrimage.Current.Name;
+        }
+    }
+
+    private async Task HandleMoveStop(Tuple<int, int> indices)
+    {
+        await Pilgrimage.MoveStopAsync(indices.Item1, indices.Item2);
+    }
+
+    private async Task HandleDaysChanged(Tuple<string, int> change)
+    {
+        await Pilgrimage.UpdateDaysAsync(change.Item1, change.Item2);
+    }
+
+    private async Task HandleRemoveStop(string locationId)
+    {
+        await Pilgrimage.RemoveStopAsync(locationId);
+    }
+
+    private async Task HandleConfirmClear()
+    {
+        await Pilgrimage.ClearAsync();
+        _showClearModal = false;
+    }
+
+    private async Task HandlePrintCallSheet()
+    {
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("window.print");
+        }
+        catch
+        {
+            // Print fallback
+        }
+    }
+
+    private int CalculateUniqueCountries()
+    {
+        return Pilgrimage.Current.Stops
+            .Select(s => s.DisplayPlace)
+            .Distinct()
+            .Count();
+    }
+
+    public void Dispose()
+    {
+        Pilgrimage.OnChange -= HandleStateChanged;
+    }
+}

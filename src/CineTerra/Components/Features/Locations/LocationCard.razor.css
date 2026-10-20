@@ -1,0 +1,184 @@
+/* LocationCard — Light Mode Cinematic Destination Window */
+.location-card {
+    display: flex;
+    flex-direction: column;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: var(--radius-lg, 16px);
+    box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+    cursor: pointer;
+    transition: transform var(--duration-base, 300ms) var(--ease-cinematic, cubic-bezier(0.16, 1, 0.3, 1)), 
+                border-color var(--duration-fast, 160ms) ease, 
+                box-shadow var(--duration-base, 300ms) ease;
+}
+
+.location-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(217, 119, 6, 0.3);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.09);
+}
+
+.location-card:focus-visible {
+    outline: 2px solid #d97706;
+    outline-offset: 3px;
+}
+
+/* Landscape Viewport Window */
+.location-card__frame {
+    position: relative;
+    width: 100%;
+    height: 230px;
+    background-color: #f1f3f5;
+    overflow: hidden;
+}
+
+.location-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.location-card:hover .location-card__image {
+    transform: scale(1.07);
+}
+
+.location-card__top-badges {
+    position: absolute;
+    top: 0.85rem;
+    left: 0.85rem;
+    right: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    pointer-events: none;
+    z-index: 2;
+}
+
+/* Human Tag Chips */
+.location-card__chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+    border-radius: var(--radius-pill, 9999px);
+    font-weight: 600;
+}
+
+.location-card__chip--region {
+    background-color: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    color: #1e293b;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.location-card__chip--scenes {
+    background-color: #d97706; /* Warm Amber */
+    color: #ffffff;
+    box-shadow: 0 2px 8px rgba(217, 119, 6, 0.35);
+}
+
+.location-card__chip--accessibility {
+    background-color: #f1f5f9;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+/* Body */
+.location-card__body {
+    padding: 1.35rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    flex: 1;
+}
+
+.location-card__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+}
+
+.location-card__title {
+    font-family: var(--font-display, "Playfair Display", Georgia, serif);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #0f172a;
+    margin: 0;
+    line-height: 1.25;
+    letter-spacing: -0.015em;
+}
+
+.location-card__place {
+    font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+    font-size: 0.875rem;
+    color: #64748b;
+    margin: 0;
+    font-weight: 500;
+}
+
+.location-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin: 0.15rem 0;
+}
+
+.location-card__description {
+    font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+    font-size: 0.875rem;
+    color: #475569;
+    line-height: 1.55;
+    margin: 0;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Actions */
+.location-card__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px solid #f1f5f9;
+}
+
+.location-card__btn {
+    font-family: var(--font-body, "Plus Jakarta Sans", sans-serif);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    padding: 0.45rem 0.95rem;
+    border-radius: var(--radius-pill, 9999px);
+    cursor: pointer;
+    transition: all var(--duration-fast, 160ms) ease;
+    border: 1px solid transparent;
+}
+
+.location-card__btn--primary {
+    background-color: #d97706; /* Warm Amber */
+    color: #ffffff;
+    box-shadow: 0 2px 6px rgba(217, 119, 6, 0.25);
+}
+
+.location-card__btn--primary:hover {
+    background-color: #b45309;
+    box-shadow: 0 4px 10px rgba(217, 119, 6, 0.35);
+}
+
+.location-card__btn--secondary {
+    background-color: #f8fafc;
+    color: #334155;
+    border-color: #e2e8f0;
+}
+
+.location-card__btn--secondary:hover {
+    background-color: #e2e8f0;
+    color: #0f172a;
+}

@@ -1,0 +1,566 @@
+/* Home.razor.css — Scroll-Driven Full-Bleed Scenery Immersion (Pristine Light Mode) */
+
+.cinema-loading-hero {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 1. FIXED FULL-SCREEN SCENERY BACKDROP CONTAINER */
+.scenery-fixed-backdrop {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background-color: #f7f6f2;
+}
+
+.stage-backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  opacity: 0;
+  transform: scale(1.0);
+  transition: opacity 1100ms var(--ease-cinematic), transform 1800ms var(--ease-cinematic);
+  will-change: opacity, transform;
+}
+
+.stage-backdrop--active {
+  opacity: 1;
+  transform: scale(1.04);
+}
+
+/* Light Mode Photographic Ambient Overlays */
+.stage-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.stage-overlay--top {
+  height: 24vh;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0.4) 60%, transparent 100%);
+}
+
+.stage-overlay--ambient {
+  background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.42) 100%);
+}
+
+.stage-overlay--bottom {
+  top: auto;
+  bottom: 0;
+  height: 28vh;
+  background: linear-gradient(0deg, rgba(251, 251, 250, 0.95) 0%, rgba(251, 251, 250, 0.5) 60%, transparent 100%);
+}
+
+/* 2. FLOATING CHAPTER PROGRESS DOCK */
+.scenery-floating-dock {
+  position: fixed;
+  right: 2rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+  padding: 1.25rem 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+  max-width: 260px;
+  transition: all var(--duration-base) var(--ease-cinematic);
+}
+
+.scenery-dock-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.scenery-dock-label {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: var(--color-ink-muted);
+  text-transform: uppercase;
+}
+
+.scenery-dock-count {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-accent);
+}
+
+.scenery-dock-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.scenery-dock-dot {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.45rem 0.65rem;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.scenery-dock-dot:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+.scenery-dock-dot__bullet {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: all var(--duration-fast) ease;
+  flex-shrink: 0;
+}
+
+.scenery-dock-dot__text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.scenery-dock-dot__film {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-ink-secondary);
+}
+
+.scenery-dock-dot__place {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  color: var(--color-ink-muted);
+}
+
+.scenery-dock-dot--active {
+  background: rgba(194, 91, 14, 0.08);
+}
+
+.scenery-dock-dot--active .scenery-dock-dot__bullet {
+  background: var(--color-accent);
+  box-shadow: 0 0 10px var(--color-accent-glow);
+  transform: scale(1.35);
+}
+
+.scenery-dock-dot--active .scenery-dock-dot__film {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.scenery-dock-theater-jump {
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-accent);
+  background: rgba(194, 91, 14, 0.06);
+  border: 1px solid rgba(194, 91, 14, 0.2);
+  padding: 0.45rem 0.75rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  text-align: center;
+  transition: all var(--duration-fast) ease;
+  margin-top: 0.25rem;
+}
+
+.scenery-dock-theater-jump:hover {
+  background: rgba(194, 91, 14, 0.14);
+}
+
+/* 3. SCROLL TRACK & SCENIC CHAPTER SECTIONS */
+.scenery-scroll-track {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+}
+
+.scenery-scroll-section {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  padding: 7rem var(--margin-page) 5rem;
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+}
+
+.scenery-scroll-section--left {
+  justify-content: flex-start;
+}
+
+.scenery-scroll-section--right {
+  justify-content: flex-end;
+}
+
+.scenery-scroll-section--center {
+  justify-content: center;
+}
+
+/* FLOATING WHITE FROSTED GLASS STORY CARDS */
+.scenery-story-card {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.08);
+  border-radius: 28px;
+  padding: 2.75rem;
+  max-width: 620px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: relative;
+  transition: transform var(--duration-base) var(--ease-cinematic), box-shadow var(--duration-base) ease;
+}
+
+.scenery-story-card:hover {
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.12);
+  transform: translateY(-3px);
+}
+
+.scenery-card-badge-row {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.scenery-card-chapter-pill {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-accent);
+  background: rgba(194, 91, 14, 0.1);
+  border: 1px solid rgba(194, 91, 14, 0.25);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-pill);
+}
+
+.scenery-card-film-pill {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--color-ink-secondary);
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 0.3rem 0.8rem;
+  border-radius: var(--radius-pill);
+}
+
+.scenery-card-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.85rem, 1.4rem + 1.8vw, 2.75rem);
+  font-weight: 800;
+  color: var(--color-ink);
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+
+.scenery-card-place {
+  font-family: var(--font-body);
+  font-size: var(--step-lead);
+  font-weight: 500;
+  color: var(--color-ink-secondary);
+  margin: -0.35rem 0 0;
+}
+
+.scenery-card-narrative {
+  font-family: var(--font-body);
+  font-size: var(--step-body);
+  color: var(--color-ink-secondary);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.scenery-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.scenery-card-pilgrimage-btn {
+  font-family: var(--font-body);
+  font-size: var(--step-small);
+  font-weight: 600;
+  color: var(--color-ink);
+  background: #ffffff;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  padding: 0.6rem 1.25rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.scenery-card-pilgrimage-btn:hover {
+  background: #f8fafc;
+  border-color: rgba(0, 0, 0, 0.22);
+}
+
+.scenery-card-pilgrimage-btn--added {
+  background: rgba(22, 163, 74, 0.1);
+  border-color: var(--color-success);
+  color: var(--color-success);
+}
+
+.scenery-card-lens-btn {
+  font-family: var(--font-body);
+  font-size: var(--step-small);
+  font-weight: 600;
+  color: var(--color-accent);
+  background: transparent;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.scenery-card-lens-btn:hover {
+  background: rgba(194, 91, 14, 0.08);
+}
+
+.scenery-card-scroll-hint {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  color: var(--color-ink-muted);
+  cursor: pointer;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  transition: color var(--duration-fast) ease;
+}
+
+.scenery-card-scroll-hint:hover {
+  color: var(--color-accent);
+}
+
+.scenery-scroll-arrow {
+  animation: bounceHint 1.8s infinite ease-in-out;
+}
+
+@keyframes bounceHint {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(4px); }
+}
+
+/* 4. THEATER SECTION (Scene vs Reality Comparison) */
+.theater-section {
+  padding: 7rem var(--margin-page);
+  background: #ffffff;
+  position: relative;
+  z-index: 10;
+  border-top: 1px solid var(--color-border);
+}
+
+.theater-inner {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.section-badge-wrap {
+  margin-bottom: 1rem;
+}
+
+.theater-heading {
+  font-family: var(--font-display);
+  font-size: var(--step-head);
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  color: var(--color-ink);
+}
+
+.theater-sub {
+  font-family: var(--font-body);
+  font-size: var(--step-lead);
+  color: var(--color-ink-muted);
+  max-width: 620px;
+  margin-bottom: 3rem;
+}
+
+.theater-slider-wrap {
+  width: 100%;
+  max-width: 1100px;
+  margin-bottom: 2.5rem;
+}
+
+.scene-selector-pills {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.selector-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--color-ink-muted);
+  letter-spacing: 0.05em;
+}
+
+.scene-pill {
+  padding: 0.45rem 1rem;
+  font-size: 0.8125rem;
+  font-family: var(--font-body);
+  color: var(--color-ink-secondary);
+  background: #f8fafc;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.scene-pill:hover {
+  color: var(--color-ink);
+  background: #f1f5f9;
+  border-color: rgba(0, 0, 0, 0.16);
+}
+
+.scene-pill--active {
+  background: #fffbeb;
+  border-color: var(--color-accent);
+  color: var(--color-accent);
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(194, 91, 14, 0.15);
+}
+
+/* 5. JOURNEY SECTION */
+.journey-section {
+  padding: 6rem var(--margin-page) 8rem;
+  background-color: var(--color-bg-deep);
+  border-top: 1px solid var(--color-border);
+  position: relative;
+  z-index: 10;
+}
+
+.journey-inner {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.journey-heading {
+  font-family: var(--font-display);
+  font-size: var(--step-head);
+  font-weight: 800;
+  margin-bottom: 0.75rem;
+  color: var(--color-ink);
+}
+
+.journey-sub {
+  font-family: var(--font-body);
+  font-size: var(--step-lead);
+  color: var(--color-ink-muted);
+  margin-bottom: 3.5rem;
+}
+
+.journey-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  width: 100%;
+  margin-bottom: 3.5rem;
+  text-align: left;
+}
+
+.journey-card {
+  padding: 2.5rem 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  transition: transform var(--duration-base) var(--ease-cinematic), box-shadow var(--duration-base) ease;
+}
+
+.journey-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+.journey-num {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--color-accent);
+}
+
+.journey-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.journey-card p {
+  font-family: var(--font-body);
+  font-size: var(--step-body);
+  color: var(--color-ink-muted);
+  line-height: 1.6;
+}
+
+.journey-cta {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .scenery-floating-dock {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .scenery-scroll-section {
+    min-height: auto;
+    padding-top: 6rem;
+    padding-bottom: 4rem;
+  }
+  .scenery-story-card {
+    padding: 2rem;
+  }
+  .journey-grid {
+    grid-template-columns: 1fr;
+  }
+}

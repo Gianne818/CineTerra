@@ -1,0 +1,90 @@
+@inject PilgrimageState Pilgrimage
+@inject IPassportService Passport
+@inject IJSRuntime JS
+@implements IDisposable
+
+<header class="cinema-header-wrap">
+    <div class="cinema-capsule">
+        <a href="@AppRoutes.Home" class="cinema-brand">
+            <span class="cinema-brand__name">CineTerra</span>
+        </a>
+
+        <nav class="cinema-nav" aria-label="Main Navigation">
+            <NavLink href="@AppRoutes.Home" class="cinema-nav__link" Match="NavLinkMatch.All">
+                Sceneries
+            </NavLink>
+            <NavLink href="@AppRoutes.Productions" class="cinema-nav__link" Match="NavLinkMatch.Prefix">
+                Canon
+            </NavLink>
+            <NavLink href="@AppRoutes.Pilgrimage" class="cinema-nav__link cinema-nav__link--badge" Match="NavLinkMatch.Prefix">
+                Pilgrimage
+                @if (Pilgrimage.Current.Stops.Count > 0)
+                {
+                    <span class="cinema-badge">@Pilgrimage.Current.Stops.Count</span>
+                }
+            </NavLink>
+            <NavLink href="@AppRoutes.Passport" class="cinema-nav__link cinema-nav__link--badge" Match="NavLinkMatch.Prefix">
+                Passport
+                @if (_collectedCount > 0)
+                {
+                    <span class="cinema-badge cinema-badge--accent">@_collectedCount</span>
+                }
+            </NavLink>
+        </nav>
+
+        <div class="cinema-actions">
+            <button class="ambient-toggle @(_isAmbientPlaying ? "ambient-toggle--active" : "")" 
+                    @onclick="ToggleAmbientSound" 
+                    title="Toggle Nature Soundscape"
+                    aria-label="Toggle Nature Soundscape">
+                <span class="eq-bars">
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                    <span class="eq-bar"></span>
+                </span>
+                <span class="ambient-label">@(_isAmbientPlaying ? "Sound On" : "Ambient")</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+@code {
+    private int _collectedCount;
+    private bool _isAmbientPlaying;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Pilgrimage.OnChange += StateHasChanged;
+        Passport.OnPassportChanged += HandlePassportChanged;
+
+        await Pilgrimage.InitializeAsync();
+        await Passport.InitializeAsync();
+        var stamps = await Passport.GetCollectedStampsAsync();
+        _collectedCount = stamps.Count;
+    }
+
+    private async Task ToggleAmbientSound()
+    {
+        try
+        {
+            _isAmbientPlaying = await JS.InvokeAsync<bool>("cineterra.toggleAmbientSound");
+        }
+        catch
+        {
+            _isAmbientPlaying = !_isAmbientPlaying;
+        }
+    }
+
+    private async void HandlePassportChanged()
+    {
+        var stamps = await Passport.GetCollectedStampsAsync();
+        _collectedCount = stamps.Count;
+        await InvokeAsync(StateHasChanged);
+    }
+
+    public void Dispose()
+    {
+        Pilgrimage.OnChange -= StateHasChanged;
+        Passport.OnPassportChanged -= HandlePassportChanged;
+    }
+}

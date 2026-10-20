@@ -1,0 +1,58 @@
+@namespace CineTerra.Components.Common
+
+<div class="cinema-empty @CssClass"
+     role="region"
+     aria-label="@Title"
+     @attributes="AdditionalAttributes">
+
+    <div class="cinema-empty__frame">
+        <div class="cinema-empty__icon-wrap">
+            @if (Icon is not null)
+            {
+                @Icon
+            }
+            else
+            {
+                <svg class="cinema-empty__crosshair"
+                     viewBox="0 0 64 64"
+                     fill="none"
+                     xmlns="http://www.w3.org/2000/svg"
+                     aria-hidden="true">
+                    <circle cx="32" cy="32" r="22" stroke="currentColor" stroke-width="1.5" stroke-dasharray="4 3" opacity="0.4" />
+                    <circle cx="32" cy="32" r="6" stroke="currentColor" stroke-width="1.5" opacity="0.7" />
+                    <circle cx="32" cy="32" r="2" fill="var(--color-accent)" />
+                </svg>
+            }
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(TelemetryCode))
+        {
+            <span class="cinema-empty__tag">@TelemetryCode</span>
+        }
+    </div>
+
+    <div class="cinema-empty__content">
+        <h3 class="cinema-empty__title">@Title</h3>
+        @if (!string.IsNullOrWhiteSpace(Message))
+        {
+            <p class="cinema-empty__message">@Message</p>
+        }
+    </div>
+
+    @if (ChildContent is not null)
+    {
+        <div class="cinema-empty__actions">
+            @ChildContent
+        </div>
+    }
+    else if (HasAction)
+    {
+        <div class="cinema-empty__actions">
+            <AppButton Variant="primary"
+                       Href="@ActionHref"
+                       OnClick="HandleAction">
+                @ActionText
+            </AppButton>
+        </div>
+    }
+</div>

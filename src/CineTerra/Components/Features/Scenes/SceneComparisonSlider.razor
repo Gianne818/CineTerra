@@ -1,0 +1,98 @@
+@namespace CineTerra.Components.Features.Scenes
+
+<div class="scene-slider"
+     @ref="_sliderContainer"
+     @onpointerdown="HandlePointerDown"
+     @onpointermove="HandlePointerMove"
+     @onpointerup="HandlePointerUp"
+     @onpointercancel="HandlePointerUp">
+
+    <div class="scene-slider__frame">
+        <!-- Base Layer: Real-world photo -->
+        <img class="scene-slider__img scene-slider__img--real"
+             src="@Scene.RealImageUrl"
+             alt="Real-world location for @Scene.Title"
+             loading="eager" />
+
+        <!-- Overlay Layer: Film still frame, clipped to current Position -->
+        <div class="scene-slider__overlay"
+             style="clip-path: inset(0 calc(100% - @(Position.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%) 0 0);">
+            <img class="scene-slider__img scene-slider__img--film"
+                 src="@Scene.StillImageUrl"
+                 alt="Film still for @Scene.Title"
+                 loading="eager" />
+        </div>
+
+        <!-- Floating Labels -->
+        <div class="scene-slider__badge scene-slider__badge--film"
+             style="opacity: @(Position > 15 ? "1" : "0.35");">
+            <span class="scene-slider__badge-dot scene-slider__badge-dot--film"></span>
+            <span class="scene-slider__badge-text">Film Still</span>
+        </div>
+
+        <div class="scene-slider__badge scene-slider__badge--real"
+             style="opacity: @(Position < 85 ? "1" : "0.35");">
+            <span class="scene-slider__badge-dot scene-slider__badge-dot--real"></span>
+            <span class="scene-slider__badge-text">Real Scenery</span>
+        </div>
+
+        <!-- Divider Bar & Viewfinder Reticle Handle -->
+        <div class="scene-slider__divider"
+             style="left: @(Position.ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%;">
+            <div class="scene-slider__divider-line"></div>
+
+            <div class="scene-slider__handle"
+                 role="slider"
+                 tabindex="0"
+                 aria-valuenow="@((int)Math.Round(Position))"
+                 aria-valuemin="0"
+                 aria-valuemax="100"
+                 aria-label="Scene vs reality comparison slider"
+                 @onkeydown="HandleKeyDown"
+                 @onclick:stopPropagation="true">
+                
+                <div class="viewfinder-reticle">
+                    <span class="viewfinder-bracket viewfinder-bracket--tl"></span>
+                    <span class="viewfinder-bracket viewfinder-bracket--tr"></span>
+                    <span class="viewfinder-bracket viewfinder-bracket--bl"></span>
+                    <span class="viewfinder-bracket viewfinder-bracket--br"></span>
+                    
+                    <div class="viewfinder-arrows">
+                        <svg class="viewfinder-arrow" viewBox="0 0 6 10" width="6" height="10" fill="currentColor">
+                            <path d="M5 1L1 5L5 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        </svg>
+                        <span class="viewfinder-axis"></span>
+                        <svg class="viewfinder-arrow" viewBox="0 0 6 10" width="6" height="10" fill="currentColor">
+                            <path d="M1 1L5 5L1 9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Native range input transparently overlaying frame for touch & mouse gestures -->
+        <input type="range"
+               class="scene-slider__range-input"
+               min="0"
+               max="100"
+               step="0.5"
+               value="@Position.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)"
+               aria-hidden="true"
+               tabindex="-1"
+               @oninput="HandleRangeInput" />
+    </div>
+
+    <!-- Clean Caption (No split percentage, no coordinates) -->
+    <div class="scene-slider__footer">
+        <div class="scene-slider__meta">
+            <span class="scene-slider__title">@Scene.Title</span>
+            @if (!string.IsNullOrWhiteSpace(Scene.SceneDescription))
+            {
+                <span class="scene-slider__desc">— @Scene.SceneDescription</span>
+            }
+        </div>
+        <div class="scene-slider__hint">
+            <span>⇄ Drag handle to compare</span>
+        </div>
+    </div>
+</div>

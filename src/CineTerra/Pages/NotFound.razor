@@ -1,0 +1,32 @@
+@page "/404"
+@namespace CineTerra.Pages
+
+<PageTitle>404 — Destination Off the Map · CineTerra</PageTitle>
+
+<div class="notfound-page">
+    <div class="notfound-card">
+        <div class="notfound-card__body">
+            <span class="cinema-badge cinema-badge--accent">PAGE NOT FOUND</span>
+            <div class="notfound-glitch" aria-hidden="true">
+                404
+            </div>
+
+            <h1 class="notfound-title">
+                Destination Off the Map
+            </h1>
+
+            <p class="notfound-desc">
+                The optical frame or destination you requested could not be located in the CineTerra archive. It may have moved or is not yet cataloged.
+            </p>
+
+            <div class="notfound-actions">
+                <AppButton Variant="primary" Size="md" Href="@AppRoutes.Explore">
+                    Return to Destinations Archive
+                </AppButton>
+                <AppButton Variant="secondary" Size="md" Href="@AppRoutes.Home">
+                    Back to Home
+                </AppButton>
+            </div>
+        </div>
+    </div>
+</div>

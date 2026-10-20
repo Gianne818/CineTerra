@@ -1,0 +1,68 @@
+@namespace CineTerra.Components.Features.Productions
+
+<article class="production-card"
+         tabindex="0"
+         role="button"
+         aria-label="@Production.Title (@Production.ReleaseYear) directed by @Production.Director"
+         @onclick="HandleCardClick"
+         @onkeydown="HandleKeyDown">
+
+    <!-- 2:3 Poster Frame -->
+    <div class="production-card__poster-wrap">
+        <img class="production-card__poster"
+             src="@Production.PosterUrl"
+             alt="Official poster for @Production.Title"
+             loading="lazy" />
+
+        <div class="production-card__type-badge">
+            @Production.Type.ToString().ToUpperInvariant()
+        </div>
+
+        <div class="production-card__duration-badge">
+            @Production.GetDurationLabel()
+        </div>
+    </div>
+
+    <!-- Metadata Content -->
+    <div class="production-card__body">
+        <div class="production-card__header">
+            <h3 class="production-card__title">@Production.Title</h3>
+            <span class="production-card__year">@Production.ReleaseYear</span>
+        </div>
+
+        <p class="production-card__director">Dir. @Production.Director</p>
+
+        @if (Production.Genres.Count > 0)
+        {
+            <div class="production-card__genres">
+                @foreach (var genre in Production.Genres.Take(3))
+                {
+                    <span class="production-card__genre-chip" @key="genre">@genre</span>
+                }
+            </div>
+        }
+
+        @if (!string.IsNullOrWhiteSpace(Production.Synopsis))
+        {
+            <p class="production-card__synopsis">@Production.Synopsis</p>
+        }
+    </div>
+</article>
+
+@code {
+    [Parameter, EditorRequired]
+    public Production Production { get; set; } = default!;
+
+    [Parameter]
+    public EventCallback<Production> OnSelected { get; set; }
+
+    private Task HandleCardClick() => OnSelected.InvokeAsync(Production);
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key is "Enter" or " ")
+        {
+            await OnSelected.InvokeAsync(Production);
+        }
+    }
+}

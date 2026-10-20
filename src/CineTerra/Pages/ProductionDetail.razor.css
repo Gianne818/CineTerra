@@ -1,0 +1,223 @@
+/* ProductionDetail.razor.css — Light Mode Title Dossier */
+
+.production-detail-page {
+    background-color: var(--color-bg);
+    min-height: 100vh;
+    padding: 7rem var(--margin-page) 5rem;
+    position: relative;
+}
+
+.production-detail-page__inner {
+    max-width: var(--max-content-width);
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.detail-nav {
+    display: flex;
+    align-items: center;
+}
+
+/* Production Hero Banner */
+.prod-hero {
+    position: relative;
+    border-radius: var(--radius-lg);
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+    padding: 3rem;
+}
+
+.prod-hero__backdrop-wrap {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.prod-hero__backdrop {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(16px);
+    transform: scale(1.1);
+    opacity: 0.12;
+}
+
+.prod-hero__backdrop-shade {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%);
+}
+
+.prod-hero__content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 3rem;
+    align-items: flex-start;
+}
+
+.prod-hero__poster {
+    width: 100%;
+    border-radius: var(--radius-md);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.prod-hero__info-col {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.prod-hero__badges {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.prod-hero__duration-pill {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--color-ink-muted);
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-pill);
+}
+
+.prod-hero__title {
+    font-family: var(--font-display);
+    font-size: var(--step-head);
+    font-weight: 800;
+    color: var(--color-ink);
+    margin: 0;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+}
+
+.prod-hero__credits {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    font-family: var(--font-body);
+    font-size: var(--step-body);
+    color: var(--color-ink-secondary);
+}
+
+.prod-hero__credit-dot {
+    color: var(--color-border);
+}
+
+.prod-hero__genres {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.prod-hero__synopsis-box {
+    background: rgba(248, 250, 252, 0.8);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: var(--radius-md);
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.prod-hero__synopsis-title {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: var(--color-accent);
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.prod-hero__synopsis {
+    font-family: var(--font-body);
+    font-size: var(--step-body);
+    color: var(--color-ink-secondary);
+    line-height: 1.65;
+    margin: 0;
+}
+
+/* Filming Locations Section */
+.locations-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.locations-section__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    flex-wrap: wrap;
+    gap: 1rem;
+}
+
+.locations-section__title {
+    font-family: var(--font-display);
+    font-size: var(--step-head);
+    font-weight: 800;
+    color: var(--color-ink);
+    margin: 0.35rem 0 0;
+}
+
+.locations-section__count {
+    font-family: var(--font-body);
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--color-accent);
+}
+
+.locations-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+    gap: 2rem;
+}
+
+.modal-msg {
+    font-family: var(--font-body);
+    font-size: var(--step-body);
+    color: var(--color-ink-secondary);
+    line-height: 1.6;
+    margin: 0;
+}
+
+.modal-msg strong {
+    color: var(--color-accent);
+}
+
+@media (max-width: 900px) {
+    .prod-hero {
+        padding: 2rem;
+    }
+    .prod-hero__content {
+        grid-template-columns: 1fr;
+        justify-items: center;
+        text-align: center;
+    }
+    .prod-hero__poster {
+        max-width: 220px;
+    }
+    .prod-hero__credits {
+        justify-content: center;
+    }
+    .prod-hero__genres {
+        justify-content: center;
+    }
+    .locations-grid {
+        grid-template-columns: 1fr;
+    }
+}

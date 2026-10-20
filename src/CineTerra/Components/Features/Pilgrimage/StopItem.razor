@@ -1,0 +1,132 @@
+@namespace CineTerra.Components.Features.Pilgrimage
+
+<div class="stop-item">
+    <!-- Reorder controls -->
+    <div class="stop-item__reorder">
+        <button type="button"
+                class="stop-item__btn stop-item__btn--arrow"
+                disabled="@(!CanMoveUp)"
+                @onclick="MoveUp"
+                aria-label="Move @Stop.LocationName up in route">
+            ▲
+        </button>
+        <span class="stop-item__order" aria-label="Stop @(Index + 1)">
+            @(Index + 1)
+        </span>
+        <button type="button"
+                class="stop-item__btn stop-item__btn--arrow"
+                disabled="@(!CanMoveDown)"
+                @onclick="MoveDown"
+                aria-label="Move @Stop.LocationName down in route">
+            ▼
+        </button>
+    </div>
+
+    <!-- Thumbnail -->
+    <div class="stop-item__thumb-wrap">
+        @if (!string.IsNullOrWhiteSpace(Stop.ImageUrl))
+        {
+            <img class="stop-item__thumb" src="@Stop.ImageUrl" alt="@Stop.LocationName" loading="lazy" />
+        }
+        else
+        {
+            <div class="stop-item__thumb-placeholder" aria-hidden="true">🎬</div>
+        }
+    </div>
+
+    <!-- Location details -->
+    <div class="stop-item__details">
+        <h4 class="stop-item__name">@Stop.LocationName</h4>
+        <span class="stop-item__place">@Stop.DisplayPlace</span>
+    </div>
+
+    <!-- Day stepper control -->
+    <div class="stop-item__stepper" role="group" aria-label="Trip days at this stop">
+        <button type="button"
+                class="stop-item__btn stop-item__btn--step"
+                disabled="@(Stop.Days <= 1)"
+                @onclick="DecrementDays"
+                aria-label="Decrease stay duration">
+            −
+        </button>
+        <span class="stop-item__days-label">
+            <strong>@Stop.Days</strong> @(Stop.Days == 1 ? "day" : "days")
+        </span>
+        <button type="button"
+                class="stop-item__btn stop-item__btn--step"
+                disabled="@(Stop.Days >= 30)"
+                @onclick="IncrementDays"
+                aria-label="Increase stay duration">
+            +
+        </button>
+    </div>
+
+    <!-- Remove button -->
+    <button type="button"
+            class="stop-item__btn stop-item__btn--remove"
+            @onclick="HandleRemove"
+            aria-label="Remove @Stop.LocationName from itinerary"
+            title="Remove stop">
+        ✕
+    </button>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public PilgrimageStop Stop { get; set; } = default!;
+
+    [Parameter]
+    public int Index { get; set; }
+
+    [Parameter]
+    public bool CanMoveUp { get; set; }
+
+    [Parameter]
+    public bool CanMoveDown { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OnRemove { get; set; }
+
+    [Parameter]
+    public EventCallback<Tuple<int, int>> OnMove { get; set; }
+
+    [Parameter]
+    public EventCallback<Tuple<string, int>> OnDaysChanged { get; set; }
+
+    private async Task MoveUp()
+    {
+        if (CanMoveUp)
+        {
+            await OnMove.InvokeAsync(Tuple.Create(Index, Index - 1));
+        }
+    }
+
+    private async Task MoveDown()
+    {
+        if (CanMoveDown)
+        {
+            await OnMove.InvokeAsync(Tuple.Create(Index, Index + 1));
+        }
+    }
+
+    private async Task DecrementDays()
+    {
+        if (Stop.Days > 1)
+        {
+            await OnDaysChanged.InvokeAsync(Tuple.Create(Stop.LocationId, Stop.Days - 1));
+        }
+    }
+
+    private async Task IncrementDays()
+    {
+        if (Stop.Days < 30)
+        {
+            await OnDaysChanged.InvokeAsync(Tuple.Create(Stop.LocationId, Stop.Days + 1));
+        }
+    }
+
+    private async Task HandleRemove()
+    {
+        await OnRemove.InvokeAsync(Stop.LocationId);
+    }
+}

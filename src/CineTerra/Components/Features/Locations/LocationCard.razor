@@ -1,0 +1,59 @@
+@namespace CineTerra.Components.Features.Locations
+
+<article class="location-card" @onclick="HandleCardClick">
+    <!-- Clean Landscape Viewport Window -->
+    <div class="location-card__frame">
+        <img class="location-card__image"
+             src="@Location.ImageUrl"
+             alt="@Location.Name in @Location.DisplayPlace"
+             loading="lazy" />
+
+        <div class="location-card__top-badges">
+            <span class="location-card__chip location-card__chip--region">
+                @Location.Region.ToFriendlyString()
+            </span>
+            @if (Location.HasScenes)
+            {
+                <span class="location-card__chip location-card__chip--scenes">
+                    @Location.Scenes.Count @(Location.Scenes.Count == 1 ? "Scene" : "Scenes")
+                </span>
+            }
+        </div>
+    </div>
+
+    <!-- Body content -->
+    <div class="location-card__body">
+        <div class="location-card__header">
+            <h3 class="location-card__title">@Location.Name</h3>
+            <p class="location-card__place">@Location.DisplayPlace</p>
+        </div>
+
+        <div class="location-card__tags">
+            <span class="location-card__chip location-card__chip--accessibility">
+                @Location.Accessibility.ToFriendlyString()
+            </span>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Location.Description))
+        {
+            <p class="location-card__description">@Location.Description</p>
+        }
+
+        <!-- Quick action buttons -->
+        <div class="location-card__actions">
+            <button type="button"
+                    class="location-card__btn location-card__btn--primary"
+                    @onclick="HandleSelectedClick"
+                    @onclick:stopPropagation="true">
+                View Scenes
+            </button>
+            <button type="button"
+                    class="location-card__btn location-card__btn--secondary"
+                    title="Add @Location.Name to your pilgrimage route"
+                    @onclick="HandleAddToPilgrimageClick"
+                    @onclick:stopPropagation="true">
+                + Pilgrimage
+            </button>
+        </div>
+    </div>
+</article>

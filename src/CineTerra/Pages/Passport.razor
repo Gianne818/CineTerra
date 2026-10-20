@@ -1,0 +1,255 @@
+@page "/passport"
+@namespace CineTerra.Pages
+@inject IPassportService PassportService
+@inject ILocationService LocationService
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>Digital Film Passport · CineTerra</PageTitle>
+
+<div class="passport-page">
+    <div class="passport-page__inner">
+        <!-- Header -->
+        <header class="passport-header">
+            <div class="passport-header__meta">
+                <span class="cinema-badge cinema-badge--accent">FIELD PASSPORT</span>
+                <span class="passport-header__serial">
+                    PASSPORT NO: CT-@(DateTime.UtcNow.Year)
+                </span>
+            </div>
+
+            <div class="passport-header__row">
+                <div>
+                    <h1 class="passport-header__title">
+                        Film Buff Digital Passport
+                    </h1>
+                    <p class="passport-header__lead">
+                        Your permanent archival record of verified cinema destinations visited across the globe.
+                    </p>
+                </div>
+
+                @if (_collectedStamps.Count > 0)
+                {
+                    <AppButton Variant="ghost" Size="sm" OnClick="() => _showResetModal = true">
+                        Reset Passport Records
+                    </AppButton>
+                }
+            </div>
+
+            <!-- Progress Meter -->
+            <div class="passport-progress">
+                <div class="passport-progress__header">
+                    <span class="passport-progress__label">PILGRIMAGE CERTIFICATION PROGRESS</span>
+                    <span class="passport-progress__stat">
+                        <strong>@_collectedStamps.Count</strong> of <strong>@_allLocations.Count</strong> Destinations Verified (@_completionPercentage%)
+                    </span>
+                </div>
+
+                <div class="passport-progress__track" role="progressbar" aria-valuenow="@_completionPercentage" aria-valuemin="0" aria-valuemax="100">
+                    <div class="passport-progress__fill" style="width: @($"{_completionPercentage}%");"></div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 4 UI States -->
+        @if (_isLoading)
+        {
+            <LoadingSpinner FullScreen="true"
+                            Label="Opening Field Passport..." />
+        }
+        else if (_errorMessage is not null)
+        {
+            <EmptyState Title="Passport Records Inaccessible"
+                        Message="@_errorMessage"
+                        ActionText="Retry Synchronization"
+                        OnAction="LoadPassportDataAsync" />
+        }
+        else if (_allLocations.Count == 0)
+        {
+            <EmptyState Title="No Destinations Cataloged"
+                        Message="No filming locations are registered in the archive to stamp."
+                        ActionText="Explore Destinations"
+                        ActionHref="@AppRoutes.Explore" />
+        }
+        else
+        {
+            <!-- Stamp Collection Album Grid -->
+            <section class="stamps-section" aria-label="Passport stamp collection album">
+                <div class="stamps-grid">
+                    @foreach (var location in _allLocations)
+                    {
+                        var isCollected = _collectedMap.TryGetValue(location.Id, out var stamp);
+                        <PassportStamp @key="location.Id"
+                                       Location="location"
+                                       IsCollected="isCollected"
+                                       DateCollected="@stamp?.DateCollected"
+                                       OnStampClicked="HandleStampSelected" />
+                    }
+                </div>
+            </section>
+        }
+    </div>
+</div>
+
+<!-- Stamp Detail / Certificate Modal -->
+<Modal @bind-IsOpen="_showDetailModal"
+       Title="@(_selectedStamp is not null ? "Archival Certificate" : "Unexplored Destination")"
+       Size="md">
+    <ChildContent>
+        @if (_selectedLocation is not null)
+        {
+            <div class="certificate-dialog">
+                <div class="certificate-dialog__seal-wrap">
+                    <div class="certificate-seal @(_selectedStamp is not null ? "certificate-seal--verified" : "certificate-seal--locked")">
+                        <span class="certificate-seal__icon">@(_selectedStamp is not null ? "★" : "◎")</span>
+                        <span class="certificate-seal__status">
+                            @(_selectedStamp is not null ? "VERIFIED IN-SITU" : "UNSTAMPED")
+                        </span>
+                    </div>
+                </div>
+
+                <div class="certificate-dialog__content">
+                    <div class="certificate-dialog__tags">
+                        <Chip Variant="outline" Label="@_selectedLocation.Region.ToFriendlyString()" />
+                        <Chip Variant="muted" Label="@_selectedLocation.Accessibility.ToFriendlyString()" />
+                    </div>
+                    <h3 class="certificate-dialog__name">@_selectedLocation.Name</h3>
+                    <p class="certificate-dialog__place">@_selectedLocation.DisplayPlace</p>
+
+                    @if (_selectedStamp is not null)
+                    {
+                        <div class="certificate-dialog__witness-box">
+                            <span class="witness-box__label">OFFICIAL DATE OF STAMP</span>
+                            <span class="witness-box__val">
+                                @_selectedStamp.DateCollected.ToString("MMMM dd, yyyy · HH:mm:ss") UTC
+                            </span>
+                        </div>
+                    }
+                    else
+                    {
+                        <p class="certificate-dialog__unvisited-msg">
+                            You have not stamped this location yet. Visit the real-world filming destination or stamp it now to register field certification.
+                        </p>
+                    }
+                </div>
+            </div>
+        }
+    </ChildContent>
+    <FooterContent>
+        @if (_selectedLocation is not null)
+        {
+            @if (_selectedStamp is null)
+            {
+                <AppButton Variant="primary" Size="sm" OnClick="() => HandleClaimStampNow(_selectedLocation)">
+                    ★ Stamp to Claim Now
+                </AppButton>
+            }
+
+            <AppButton Variant="secondary" Size="sm" Href="@AppRoutes.Location(_selectedLocation.Id)">
+                View Destination Dossier →
+            </AppButton>
+        }
+        <AppButton Variant="ghost" Size="sm" OnClick="() => _showDetailModal = false">
+            Close
+        </AppButton>
+    </FooterContent>
+</Modal>
+
+<!-- Reset Confirmation Modal -->
+<Modal @bind-IsOpen="_showResetModal"
+       Title="Reset Digital Passport?"
+       Size="sm">
+    <ChildContent>
+        <p class="modal-msg">
+            Are you sure you want to erase all <strong>@_collectedStamps.Count collected stamps</strong>? This action will restore your passport to an unexplored state.
+        </p>
+    </ChildContent>
+    <FooterContent>
+        <AppButton Variant="secondary" Size="sm" OnClick="() => _showResetModal = false">
+            Cancel
+        </AppButton>
+        <AppButton Variant="danger" Size="sm" OnClick="HandleConfirmReset">
+            Yes, Reset Stamps
+        </AppButton>
+    </FooterContent>
+</Modal>
+
+@code {
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private IReadOnlyList<FilmingLocation> _allLocations = [];
+    private IReadOnlyList<Stamp> _collectedStamps = [];
+    private Dictionary<string, Stamp> _collectedMap = [];
+    private int _completionPercentage;
+
+    private bool _showDetailModal;
+    private bool _showResetModal;
+    private FilmingLocation? _selectedLocation;
+    private Stamp? _selectedStamp;
+
+    protected override async Task OnInitializedAsync()
+    {
+        PassportService.OnPassportChanged += HandlePassportChanged;
+        await LoadPassportDataAsync();
+    }
+
+    private async Task LoadPassportDataAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            _allLocations = await LocationService.GetAllAsync();
+            _collectedStamps = await PassportService.GetCollectedStampsAsync();
+            _collectedMap = _collectedStamps.ToDictionary(s => s.LocationId);
+
+            _completionPercentage = _allLocations.Count > 0
+                ? (int)Math.Round((double)_collectedStamps.Count / _allLocations.Count * 100)
+                : 0;
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to synchronize passport album: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void HandlePassportChanged()
+    {
+        _ = LoadPassportDataAsync().ContinueWith(_ => InvokeAsync(StateHasChanged));
+    }
+
+    private void HandleStampSelected(FilmingLocation location)
+    {
+        _selectedLocation = location;
+        _collectedMap.TryGetValue(location.Id, out _selectedStamp);
+        _showDetailModal = true;
+    }
+
+    private async Task HandleClaimStampNow(FilmingLocation location)
+    {
+        await PassportService.CollectStampAsync(
+            location.Id,
+            location.Name,
+            location.Country,
+            "archival-seal");
+
+        _collectedMap.TryGetValue(location.Id, out _selectedStamp);
+    }
+
+    private async Task HandleConfirmReset()
+    {
+        await PassportService.ResetStampsAsync();
+        _showResetModal = false;
+        _showDetailModal = false;
+    }
+
+    public void Dispose()
+    {
+        PassportService.OnPassportChanged -= HandlePassportChanged;
+    }
+}

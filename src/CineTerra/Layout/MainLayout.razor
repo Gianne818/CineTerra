@@ -1,0 +1,48 @@
+@inherits LayoutComponentBase
+
+<div class="cinema-shell">
+    <NavBar />
+
+    <main class="cinema-main" id="main-content">
+        <ErrorBoundary>
+            <ChildContent>
+                @Body
+            </ChildContent>
+            <ErrorContent Context="ex">
+                <div class="cinema-error-boundary glass-panel">
+                    <h2>Projection Interrupted</h2>
+                    <p>@ex.Message</p>
+                    <a href="/" class="cinema-btn">Return to Archive</a>
+                </div>
+            </ErrorContent>
+        </ErrorBoundary>
+    </main>
+
+    <footer class="cinema-footer">
+        <div class="cinema-footer__inner">
+            <div class="cinema-footer__brand-block">
+                <span class="cinema-footer__wordmark">CineTerra</span>
+                <p class="cinema-footer__tagline">The Living Atlas of World Cinema & Scenic Expeditions</p>
+                <p class="cinema-footer__copyright">&copy; @DateTime.UtcNow.Year CineTerra. Curated with devotion for cinema and landscape.</p>
+            </div>
+            
+            <div class="cinema-footer__links">
+                <div class="cinema-footer__col">
+                    <h4 class="cinema-footer__col-heading">Discover</h4>
+                    <ul class="cinema-footer__list">
+                        <li><a href="@AppRoutes.Home" class="cinema-footer__link">Sceneries</a></li>
+                        <li><a href="@AppRoutes.Explore" class="cinema-footer__link">Archive Directory</a></li>
+                        <li><a href="@AppRoutes.Productions" class="cinema-footer__link">Film Canon</a></li>
+                    </ul>
+                </div>
+                <div class="cinema-footer__col">
+                    <h4 class="cinema-footer__col-heading">Expeditions</h4>
+                    <ul class="cinema-footer__list">
+                        <li><a href="@AppRoutes.Pilgrimage" class="cinema-footer__link">Pilgrimage Builder</a></li>
+                        <li><a href="@AppRoutes.Passport" class="cinema-footer__link">Explorer Passport</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>

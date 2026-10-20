@@ -1,0 +1,68 @@
+@namespace CineTerra.Components.Features.Passport
+
+<div class="passport-stamp @(IsCollected ? "passport-stamp--collected" : "passport-stamp--locked")"
+     role="button"
+     tabindex="0"
+     aria-label="@($"Passport stamp for {Location.Name}: {(IsCollected ? "Collected on " + (DateCollected?.ToString("MMM dd, yyyy") ?? "visit") : "Unexplored")}")"
+     @onclick="HandleClick"
+     @onkeydown="HandleKeyDown">
+
+    <div class="stamp-seal">
+        <!-- Dual archival circular rings -->
+        <div class="stamp-seal__ring stamp-seal__ring--outer"></div>
+        <div class="stamp-seal__ring stamp-seal__ring--inner"></div>
+
+        <!-- Stamp Center Content -->
+        <div class="stamp-seal__core">
+            @if (IsCollected)
+            {
+                <span class="stamp-seal__verified">★ ARCHIVAL WITNESS ★</span>
+                <span class="stamp-seal__name">@Location.Name</span>
+                <span class="stamp-seal__country">@Location.Country</span>
+                
+                <div class="stamp-seal__rule"></div>
+                
+                @if (DateCollected.HasValue)
+                {
+                    <span class="stamp-seal__date">@DateCollected.Value.ToString("yyyy.MM.dd").ToUpperInvariant()</span>
+                }
+                else
+                {
+                    <span class="stamp-seal__date">VISITED</span>
+                }
+            }
+            else
+            {
+                <div class="stamp-seal__lock-glyph" aria-hidden="true">◎</div>
+                <span class="stamp-seal__unexplored">UNEXPLORED</span>
+                <span class="stamp-seal__name stamp-seal__name--locked">@Location.Name</span>
+                <span class="stamp-seal__country stamp-seal__country--locked">@Location.Country</span>
+                <span class="stamp-seal__prompt">STAMP TO CLAIM</span>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter, EditorRequired]
+    public FilmingLocation Location { get; set; } = default!;
+
+    [Parameter]
+    public bool IsCollected { get; set; }
+
+    [Parameter]
+    public DateTime? DateCollected { get; set; }
+
+    [Parameter]
+    public EventCallback<FilmingLocation> OnStampClicked { get; set; }
+
+    private Task HandleClick() => OnStampClicked.InvokeAsync(Location);
+
+    private async Task HandleKeyDown(KeyboardEventArgs e)
+    {
+        if (e.Key is "Enter" or " ")
+        {
+            await OnStampClicked.InvokeAsync(Location);
+        }
+    }
+}

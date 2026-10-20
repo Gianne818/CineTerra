@@ -1,0 +1,165 @@
+@page "/explore"
+@namespace CineTerra.Pages
+@inject ILocationService LocationService
+@inject PilgrimageState Pilgrimage
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>The Scenic Expeditions Archive · CineTerra</PageTitle>
+
+<div class="explore-page">
+    <div class="explore-page__inner">
+        <!-- Archival Header -->
+        <header class="explore-header">
+            <div class="explore-header__meta">
+                <span class="cinema-badge cinema-badge--accent">CINEMATIC EXPEDITIONS</span>
+                <span class="explore-header__count-badge">
+                    @(_allLocations.Count) SITES ARCHIVED
+                </span>
+            </div>
+
+            <h1 class="explore-header__title">
+                The Scenic Expeditions Archive
+            </h1>
+
+            <p class="explore-header__lead">
+                Verified real-world film and anime filming sites cross-referenced with terrain accessibility, scene stills, and local transit approaches.
+            </p>
+        </header>
+
+        <!-- 4 UI States -->
+        @if (_isLoading)
+        {
+            <LoadingSpinner FullScreen="true"
+                            Label="Loading Scenic Expeditions Archive..." />
+        }
+        else if (_errorMessage is not null)
+        {
+            <EmptyState Title="Archival Query Interrupted"
+                        Message="@_errorMessage"
+                        ActionText="Retry Query"
+                        OnAction="LoadLocationsAsync" />
+        }
+        else
+        {
+            <!-- Interactive Filter Bar -->
+            <section class="explore-filters" aria-label="Archive filters">
+                <LocationFilterBar Filter="@_filter"
+                                   TotalCount="@_allLocations.Count"
+                                   FilteredCount="@_filteredLocations.Count"
+                                   OnFilterChanged="HandleFilterChanged" />
+            </section>
+
+            @if (_filteredLocations.Count == 0)
+            {
+                <EmptyState Title="No destinations match your filter"
+                            Message="No filming locations matched your current search text, region, or terrain filters. Reset your filters to view the full collection."
+                            ActionText="Reset All Filters"
+                            OnAction="HandleResetFilters" />
+            }
+            else
+            {
+                <!-- Contact Sheet Archive Grid -->
+                <section class="explore-grid-section" aria-label="Filming locations grid">
+                    <div class="explore-grid">
+                        @foreach (var location in _filteredLocations)
+                        {
+                            <LocationCard @key="location.Id"
+                                          Location="location"
+                                          OnSelected="HandleLocationSelected"
+                                          OnAddToPilgrimage="HandleAddToPilgrimage" />
+                        }
+                    </div>
+                </section>
+            }
+        }
+    </div>
+</div>
+
+<!-- Modal confirmation when added to pilgrimage -->
+<Modal @bind-IsOpen="_showAddedModal"
+       Title="Destination Added to Pilgrimage"
+       Size="sm">
+    <ChildContent>
+        <p class="modal-msg">
+            <strong>@_lastAddedLocationName</strong> has been pinned to your active cinematic pilgrimage route.
+        </p>
+    </ChildContent>
+    <FooterContent>
+        <AppButton Variant="secondary" Size="sm" OnClick="() => _showAddedModal = false">
+            Continue Exploring
+        </AppButton>
+        <AppButton Variant="primary" Size="sm" Href="@AppRoutes.Pilgrimage">
+            View Pilgrimage Itinerary →
+        </AppButton>
+    </FooterContent>
+</Modal>
+
+@code {
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private IReadOnlyList<FilmingLocation> _allLocations = [];
+    private List<FilmingLocation> _filteredLocations = [];
+    private LocationFilter _filter = new();
+    private bool _showAddedModal;
+    private string _lastAddedLocationName = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Pilgrimage.OnChange += StateHasChanged;
+        await LoadLocationsAsync();
+    }
+
+    private async Task LoadLocationsAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            _allLocations = await LocationService.GetAllAsync();
+            ApplyFilter();
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to retrieve scenic locations: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void HandleFilterChanged()
+    {
+        ApplyFilter();
+    }
+
+    private void ApplyFilter()
+    {
+        _filteredLocations = _allLocations.Where(_filter.Matches).ToList();
+    }
+
+    private void HandleResetFilters()
+    {
+        _filter.Clear();
+        ApplyFilter();
+    }
+
+    private void HandleLocationSelected(FilmingLocation location)
+    {
+        Navigation.NavigateTo(AppRoutes.Location(location.Id));
+    }
+
+    private async Task HandleAddToPilgrimage(FilmingLocation location)
+    {
+        await Pilgrimage.AddStopAsync(location);
+        _lastAddedLocationName = location.Name;
+        _showAddedModal = true;
+    }
+
+    public void Dispose()
+    {
+        Pilgrimage.OnChange -= StateHasChanged;
+    }
+}

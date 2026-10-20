@@ -1,0 +1,227 @@
+@page "/productions/{Id}"
+@namespace CineTerra.Pages
+@inject IProductionService ProductionService
+@inject ILocationService LocationService
+@inject PilgrimageState Pilgrimage
+@inject NavigationManager Navigation
+@implements IDisposable
+
+<PageTitle>@(_production is not null ? $"{_production.Title} ({_production.ReleaseYear}) · CineTerra" : "Title Dossier · CineTerra")</PageTitle>
+
+<div class="production-detail-page">
+    <div class="production-detail-page__inner">
+        <!-- Breadcrumb / Back button -->
+        <nav class="detail-nav" aria-label="Breadcrumbs">
+            <AppButton Variant="ghost" Size="sm" Href="@AppRoutes.Productions">
+                ← Back to Canon Titles
+            </AppButton>
+        </nav>
+
+        @if (_isLoading)
+        {
+            <LoadingSpinner FullScreen="true"
+                            Label="Opening Production Dossier..." />
+        }
+        else if (_errorMessage is not null)
+        {
+            <EmptyState Title="Failed to load title dossier"
+                        Message="@_errorMessage"
+                        ActionText="Retry Query"
+                        OnAction="LoadProductionDetailsAsync" />
+        }
+        else if (_production is null)
+        {
+            <EmptyState Title="Title Not Found in Archive"
+                        Message="The requested production identifier could not be located in the CineTerra film canon."
+                        ActionText="Browse All Titles"
+                        ActionHref="@AppRoutes.Productions" />
+        }
+        else
+        {
+            <!-- Production Hero Banner -->
+            <article class="prod-hero">
+                @if (!string.IsNullOrWhiteSpace(_production.BackdropUrl))
+                {
+                    <div class="prod-hero__backdrop-wrap">
+                        <img src="@_production.BackdropUrl"
+                             alt="Atmospheric still from @_production.Title"
+                             class="prod-hero__backdrop" />
+                        <div class="prod-hero__backdrop-shade"></div>
+                    </div>
+                }
+
+                <div class="prod-hero__content">
+                    <div class="prod-hero__poster-col">
+                        <img src="@_production.PosterUrl"
+                             alt="Poster for @_production.Title"
+                             class="prod-hero__poster" />
+                    </div>
+
+                    <div class="prod-hero__info-col">
+                        <div class="prod-hero__badges">
+                            <span class="cinema-badge cinema-badge--accent">
+                                @_production.Type.ToString().ToUpperInvariant() CANON
+                            </span>
+                            <span class="prod-hero__duration-pill">
+                                @_production.GetDurationLabel()
+                            </span>
+                        </div>
+
+                        <h1 class="prod-hero__title">
+                            @_production.Title
+                        </h1>
+
+                        <div class="prod-hero__credits">
+                            <span class="prod-hero__credit-item">
+                                Directed by <strong>@_production.Director</strong>
+                            </span>
+                            <span class="prod-hero__credit-dot" aria-hidden="true">•</span>
+                            <span class="prod-hero__credit-item">
+                                Released in <strong>@_production.ReleaseYear</strong>
+                            </span>
+                            @if (_production is Anime anime && !string.IsNullOrWhiteSpace(anime.Studio))
+                            {
+                                <span class="prod-hero__credit-dot" aria-hidden="true">•</span>
+                                <span class="prod-hero__credit-item">
+                                    Studio <strong>@anime.Studio</strong>
+                                </span>
+                            }
+                        </div>
+
+                        <!-- Genre Chips -->
+                        <div class="prod-hero__genres">
+                            @foreach (var genre in _production.Genres)
+                            {
+                                <Chip @key="genre" Variant="outline" Label="@genre.ToString()" />
+                            }
+                        </div>
+
+                        <!-- Synopsis -->
+                        <div class="prod-hero__synopsis-box">
+                            <h2 class="prod-hero__synopsis-title">Logline & Synopsis</h2>
+                            <p class="prod-hero__synopsis">@_production.Synopsis</p>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Filming Locations for this Title Section -->
+            <section class="locations-section" aria-labelledby="locations-heading">
+                <div class="locations-section__header">
+                    <div>
+                        <span class="cinema-badge cinema-badge--accent">FILMING DESTINATIONS</span>
+                        <h2 id="locations-heading" class="locations-section__title">
+                            Filming Locations for this Title
+                        </h2>
+                    </div>
+
+                    <span class="locations-section__count">
+                        @_matchedLocations.Count @(_matchedLocations.Count == 1 ? "Verified Location" : "Verified Locations")
+                    </span>
+                </div>
+
+                @if (_matchedLocations.Count == 0)
+                {
+                    <EmptyState Title="No filming locations mapped yet"
+                                Message="Filming locations and scene matches for this title are currently being cataloged. Check back soon for new vistas."
+                                ActionText="Explore Other Destinations"
+                                ActionHref="@AppRoutes.Explore" />
+                }
+                else
+                {
+                    <div class="locations-grid">
+                        @foreach (var loc in _matchedLocations)
+                        {
+                            <LocationCard @key="loc.Id"
+                                          Location="loc"
+                                          OnSelected="HandleLocationSelected"
+                                          OnAddToPilgrimage="HandleAddToPilgrimage" />
+                        }
+                    </div>
+                }
+            </section>
+        }
+    </div>
+</div>
+
+<!-- Modal confirmation when added to pilgrimage -->
+<Modal @bind-IsOpen="_showAddedModal"
+       Title="Destination Added to Pilgrimage"
+       Size="sm">
+    <ChildContent>
+        <p class="modal-msg">
+            <strong>@_lastAddedLocationName</strong> has been pinned to your active cinematic pilgrimage route.
+        </p>
+    </ChildContent>
+    <FooterContent>
+        <AppButton Variant="secondary" Size="sm" OnClick="() => _showAddedModal = false">
+            Continue Exploring
+        </AppButton>
+        <AppButton Variant="primary" Size="sm" Href="@AppRoutes.Pilgrimage">
+            View Pilgrimage Itinerary →
+        </AppButton>
+    </FooterContent>
+</Modal>
+
+@code {
+    [Parameter]
+    public string Id { get; set; } = string.Empty;
+
+    private bool _isLoading = true;
+    private string? _errorMessage;
+    private Production? _production;
+    private IReadOnlyList<FilmingLocation> _matchedLocations = [];
+    private bool _showAddedModal;
+    private string _lastAddedLocationName = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadProductionDetailsAsync();
+    }
+
+    protected override void OnInitialized()
+    {
+        Pilgrimage.OnChange += StateHasChanged;
+    }
+
+    private async Task LoadProductionDetailsAsync()
+    {
+        _isLoading = true;
+        _errorMessage = null;
+
+        try
+        {
+            _production = await ProductionService.GetByIdAsync(Id);
+
+            if (_production is not null)
+            {
+                _matchedLocations = await LocationService.GetByProductionAsync(Id);
+            }
+        }
+        catch (Exception ex)
+        {
+            _errorMessage = $"Failed to read production dossier: {ex.Message}";
+        }
+        finally
+        {
+            _isLoading = false;
+        }
+    }
+
+    private void HandleLocationSelected(FilmingLocation location)
+    {
+        Navigation.NavigateTo(AppRoutes.Location(location.Id));
+    }
+
+    private async Task HandleAddToPilgrimage(FilmingLocation location)
+    {
+        await Pilgrimage.AddStopAsync(location);
+        _lastAddedLocationName = location.Name;
+        _showAddedModal = true;
+    }
+
+    public void Dispose()
+    {
+        Pilgrimage.OnChange -= StateHasChanged;
+    }
+}

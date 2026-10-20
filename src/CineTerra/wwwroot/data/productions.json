@@ -1,0 +1,128 @@
+[
+  {
+    "kind": "anime",
+    "id": "suzume-2022",
+    "title": "Suzume",
+    "releaseYear": 2022,
+    "director": "Makoto Shinkai",
+    "studio": "CoMix Wave Films",
+    "episodes": 0,
+    "synopsis": "A teenage girl and a mysterious young man travel across abandoned ruins in Japan closing calamity-bearing doors to prevent catastrophic disasters.",
+    "posterUrl": "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=700&q=80",
+    "backdropUrl": "https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=1600&q=80",
+    "genres": [
+      "Anime",
+      "Fantasy",
+      "Adventure"
+    ]
+  },
+  {
+    "kind": "film",
+    "id": "dune-2021",
+    "title": "Dune",
+    "releaseYear": 2021,
+    "director": "Denis Villeneuve",
+    "runtimeMinutes": 155,
+    "synopsis": "Paul Atreides leads nomadic desert tribes in a battle for control over Arrakis, the inhospitable planet harboring the universe's most precious spice.",
+    "posterUrl": "https://images.unsplash.com/photo-1509316975850-ff9c5deb0cd9?w=700&q=80",
+    "backdropUrl": "https://images.unsplash.com/photo-1547234935-80c7145ec969?w=1600&q=80",
+    "genres": [
+      "SciFi",
+      "Adventure"
+    ]
+  },
+  {
+    "kind": "film",
+    "id": "lotr-fellowship-2001",
+    "title": "The Lord of the Rings: The Fellowship of the Ring",
+    "releaseYear": 2001,
+    "director": "Peter Jackson",
+    "runtimeMinutes": 178,
+    "synopsis": "A meek Hobbit of the Shire and eight companions set out on a perilous journey to Mount Doom to destroy the powerful One Ring.",
+    "posterUrl": "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=700&q=80",
+    "backdropUrl": "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=1600&q=80",
+    "genres": [
+      "Fantasy",
+      "Adventure"
+    ]
+  },
+  {
+    "kind": "anime",
+    "id": "spirited-away-2001",
+    "title": "Spirited Away",
+    "releaseYear": 2001,
+    "director": "Hayao Miyazaki",
+    "studio": "Studio Ghibli",
+    "episodes": 0,
+    "synopsis": "During her family's move to the suburbs, a sullen 10-year-old girl wanders into a magical world ruled by gods, witches, and spirits.",
+    "posterUrl": "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=700&q=80",
+    "backdropUrl": "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=1600&q=80",
+    "genres": [
+      "Anime",
+      "Fantasy",
+      "Animation"
+    ]
+  },
+  {
+    "kind": "series",
+    "id": "game-of-thrones-2011",
+    "title": "Game of Thrones",
+    "releaseYear": 2011,
+    "director": "David Benioff & D.B. Weiss",
+    "seasons": 8,
+    "synopsis": "Nine noble families fight for control over the lands of Westeros, while an ancient enemy returns after being dormant for millennia.",
+    "posterUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=700&q=80",
+    "backdropUrl": "https://images.unsplash.com/photo-1516483638261-f4dbaf036963?w=1600&q=80",
+    "genres": [
+      "Fantasy",
+      "Drama"
+    ]
+  },
+  {
+    "kind": "film",
+    "id": "inception-2010",
+    "title": "Inception",
+    "releaseYear": 2010,
+    "director": "Christopher Nolan",
+    "runtimeMinutes": 148,
+    "synopsis": "A thief who steals corporate secrets through the use of dream-sharing technology is given the inverse task of planting an idea into the mind of a CEO.",
+    "posterUrl": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=700&q=80",
+    "backdropUrl": "https://images.unsplash.com/photo-1477959858617-67f30bc75b82?w=1600&q=80",
+    "genres": [
+      "SciFi",
+      "Mystery"
+    ]
+  },
+  {
+    "kind": "anime",
+    "id": "your-name-2016",
+    "title": "Your Name",
+    "releaseYear": 2016,
+    "director": "Makoto Shinkai",
+    "studio": "CoMix Wave Films",
+    "episodes": 0,
+    "synopsis": "Two teenagers share a profound, magical connection upon discovering they are swapping bodies across space and time.",
+    "posterUrl": "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=700&q=80",
+    "backdropUrl": "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=1600&q=80",
+    "genres": [
+      "Anime",
+      "Drama",
+      "Fantasy"
+    ]
+  },
+  {
+    "kind": "film",
+    "id": "star-wars-last-jedi-2017",
+    "title": "Star Wars: The Last Jedi",
+    "releaseYear": 2017,
+    "director": "Rian Johnson",
+    "runtimeMinutes": 152,
+    "synopsis": "Rey develops her newly discovered abilities with the guidance of Luke Skywalker, who is unsettled by the strength of her powers on Ahch-To.",
+    "posterUrl": "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=700&q=80",
+    "backdropUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80",
+    "genres": [
+      "SciFi",
+      "Adventure"
+    ]
+  }
+]
