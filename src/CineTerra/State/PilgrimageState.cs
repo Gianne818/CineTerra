@@ -6,7 +6,7 @@ using CineTerra.Utilities;
 
 namespace CineTerra.State;
 
-public sealed class PilgrimageState(ILocalStorageService storage)
+public sealed class PilgrimageState(ILocalStorageService storage, ILocationService locationService)
 {
     private bool _initialized;
 
@@ -21,7 +21,14 @@ public sealed class PilgrimageState(ILocalStorageService storage)
         var dto = await storage.GetAsync<PilgrimageDto>(StorageKeys.Pilgrimage);
         if (dto is not null)
         {
-            Current = dto.ToDomain();
+            var locations = await locationService.GetAllAsync();
+            var locationMap = locations.ToDictionary(l => l.Id, l => l.ImageUrl);
+            var refreshedStops = dto.Stops
+                .Select(s => locationMap.TryGetValue(s.LocationId, out var latestImg) && !string.IsNullOrWhiteSpace(latestImg)
+                    ? s with { ImageUrl = latestImg }
+                    : s)
+                .ToList();
+            Current = (dto with { Stops = refreshedStops }).ToDomain();
         }
 
         _initialized = true;

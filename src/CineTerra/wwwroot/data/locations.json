@@ -36,15 +36,15 @@
     },
     "description": "The dramatic concrete arch bridge spanning the Kanda River where multiple train lines (Chuo, Sobu, and Tokyo Metro Marunouchi) cross simultaneously, featured in Suzume's climactic Tokyo worm battle.",
     "practicalTips": "Located immediately outside JR Ochanomizu Station. Stand on the northern pedestrian walkway looking downstream toward Akihabara to frame the exact anime perspective.",
-    "imageUrl": "images/locations/hijiribashi.jpg",
+    "imageUrl": "images/locations/hijiribashi.jpg?v=2",
     "accessibility": "EasyWalk",
     "scenes": [
       {
         "productionId": "suzume-2022",
         "title": "The Leap Above the Kanda River",
         "timestamp": "01:08:45",
-        "stillImageUrl": "images/scenes/suzume-hijiribashi-still.png",
-        "realImageUrl": "images/scenes/suzume-hijiribashi-real.jpg",
+        "stillImageUrl": "images/scenes/suzume-hijiribashi-still.png?v=2",
+        "realImageUrl": "images/scenes/suzume-hijiribashi-real.jpg?v=2",
         "sceneDescription": "Suzume leaps off the granite balustrade of Hijiribashi Bridge onto the roof of an oncoming train car to reach the gigantic spectral worm over Tokyo."
       }
     ]
@@ -136,15 +136,15 @@
     },
     "description": "A pristine medieval walled harbor city on the Adriatic coast that served as the primary set for King's Landing, capital of the Seven Kingdoms in Game of Thrones.",
     "practicalTips": "Walk the 1.9 km perimeter walls at opening (08:00) before tour cruise crowds arrive. The Jesuit Stairs (Walk of Shame) are near Gundulic Square.",
-    "imageUrl": "images/locations/dubrovnik-old-town.jpg",
+    "imageUrl": "images/locations/dubrovnik-old-town.jpg?v=2",
     "accessibility": "Moderate",
     "scenes": [
       {
         "productionId": "game-of-thrones-2011",
         "title": "Battle of the Blackwater",
         "timestamp": "00:48:10",
-        "stillImageUrl": "images/scenes/got-kings-landing-still.jpg",
-        "realImageUrl": "images/scenes/got-kings-landing-real.jpg",
+        "stillImageUrl": "images/scenes/got-kings-landing-still.jpg?v=2",
+        "realImageUrl": "images/scenes/got-kings-landing-real.jpg?v=2",
         "sceneDescription": "Stannis Baratheon's royal fleet advances on King's Landing harbor beneath the ramparts of the Red Keep."
       }
     ]
@@ -161,15 +161,15 @@
     },
     "description": "A striking two-level steel bridge over the Seine with a dedicated viaduct colonnade, famously featured as Ariadne's dream-architecture training ground in Inception.",
     "practicalTips": "Metro Line 6 stops right at Passy or Bir-Hakeim. Stand in the central steel arch arcade facing the Eiffel Tower to replicate the mirror-fold scene.",
-    "imageUrl": "images/locations/pont-de-bir-hakeim.jpg",
+    "imageUrl": "images/locations/pont-de-bir-hakeim.jpg?v=2",
     "accessibility": "EasyWalk",
     "scenes": [
       {
         "productionId": "inception-2010",
         "title": "Architecting the Subconscious",
         "timestamp": "00:32:40",
-        "stillImageUrl": "images/scenes/inception-bir-hakeim-still.jpg",
-        "realImageUrl": "images/scenes/inception-bir-hakeim-real.jpg",
+        "stillImageUrl": "images/scenes/inception-bir-hakeim-still.jpg?v=2",
+        "realImageUrl": "images/scenes/inception-bir-hakeim-real.jpg?v=2",
         "sceneDescription": "Cobb instructs Ariadne on subconscious physics as she creates giant mirrors that reflect the steel bridge viaduct into an infinite corridor."
       }
     ]

@@ -1,4 +1,4 @@
-@page "/"
+﻿@page "/"
 @inject ILocationService LocationService
 @inject IProductionService ProductionService
 @inject PilgrimageState Pilgrimage
@@ -156,17 +156,17 @@ else
 
             <div class="scene-selector-pills">
                 <span class="selector-label">SELECT FILM SCENE:</span>
-                @foreach (var chap in _chapters)
+                @foreach (var loc in _allLocations)
                 {
-                    var loc = _allLocations.FirstOrDefault(l => l.Id == chap.LocationId);
-                    var scene = loc?.Scenes.FirstOrDefault();
+                    var scene = loc.Scenes.FirstOrDefault();
                     if (scene != null)
                     {
+                        var filmTitle = _productionTitles.GetValueOrDefault(scene.ProductionId, loc.Name);
                         var isCurrent = _currentFlagshipScene?.Title == scene.Title;
                         <button type="button"
                                 class="scene-pill @(isCurrent ? "scene-pill--active" : "")"
                                 @onclick="() => _currentFlagshipScene = scene">
-                            <strong>@chap.FilmTitle</strong> · @scene.Title
+                            <strong>@filmTitle</strong> · @scene.Title
                         </button>
                     }
                 }
@@ -223,6 +223,7 @@ else
     private int _activeChapterIndex = 0;
     private DotNetObjectReference<Home>? _dotNetRef;
     private IReadOnlyList<FilmingLocation> _allLocations = [];
+    private Dictionary<string, string> _productionTitles = [];
     private Scene? _currentFlagshipScene;
 
     private readonly List<ScenicChapter> _chapters =
@@ -289,6 +290,8 @@ else
         try
         {
             _allLocations = await LocationService.GetAllAsync();
+            var productions = await ProductionService.GetAllAsync();
+            _productionTitles = productions.ToDictionary(p => p.Id, p => p.Title);
             var bungo = _allLocations.FirstOrDefault(l => l.Id == "bungo-mori-roundhouse");
             _currentFlagshipScene = bungo?.Scenes.FirstOrDefault() ?? _allLocations.FirstOrDefault(l => l.HasScenes)?.Scenes.FirstOrDefault();
         }

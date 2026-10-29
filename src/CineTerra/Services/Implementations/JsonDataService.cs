@@ -25,7 +25,9 @@ public abstract class JsonDataService<T> where T : BaseEntity
 
         try
         {
-            var data = await _http.GetFromJsonAsync<List<T>>(_dataPath, JsonDefaults.Options);
+            var separator = _dataPath.Contains('?') ? '&' : '?';
+            var requestPath = $"{_dataPath}{separator}v=2";
+            var data = await _http.GetFromJsonAsync<List<T>>(requestPath, JsonDefaults.Options);
             _cache = data ?? [];
         }
         catch (Exception ex)
