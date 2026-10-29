@@ -10,4 +10,5 @@ public interface ILocationService
     Task<IReadOnlyList<FilmingLocation>> GetByProductionAsync(string productionId);
     Task<IReadOnlyList<FilmingLocation>> SearchAsync(LocationFilter filter);
     Task<IReadOnlyList<FilmingLocation>> GetFeaturedAsync(int count = 6);
+    IReadOnlyList<FilmingLocation> Filter(IEnumerable<FilmingLocation> locations, LocationFilter filter);
 }

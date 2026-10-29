@@ -23,28 +23,4 @@ public sealed class LocationFilter
         SelectedRegion = null;
         SelectedDifficulty = null;
     }
-
-    public bool Matches(FilmingLocation location)
-    {
-        if (!string.IsNullOrWhiteSpace(SearchText))
-        {
-            var query = SearchText.Trim();
-            var matchesText =
-                location.Name.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                location.City.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                location.Country.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                location.Description.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                location.Scenes.Any(s => s.Title.Contains(query, StringComparison.OrdinalIgnoreCase));
-
-            if (!matchesText) return false;
-        }
-
-        if (SelectedRegion.HasValue && location.Region != SelectedRegion.Value)
-            return false;
-
-        if (SelectedDifficulty.HasValue && location.Accessibility != SelectedDifficulty.Value)
-            return false;
-
-        return true;
-    }
 }
