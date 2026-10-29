@@ -12,6 +12,7 @@ public sealed class Pilgrimage : BaseEntity
     public string Name { get; private set; } = "My Cinematic Pilgrimage";
     public IReadOnlyList<PilgrimageStop> Stops => _stops.AsReadOnly();
     public int TotalDays => _stops.Sum(s => s.Days);
+    public int UniqueDestinationsCount => _stops.Select(s => s.DisplayPlace).Distinct().Count();
     public bool IsFull => _stops.Count >= MaxStops;
     public bool HasStops => _stops.Count > 0;
 

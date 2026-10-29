@@ -70,7 +70,7 @@
                 <div class="metric-card">
                     <span class="metric-card__label">EXPEDITION SPAN</span>
                     <span class="metric-card__value">
-                        @CalculateUniqueCountries()
+                        @Pilgrimage.Current.UniqueDestinationsCount
                         <small>REGIONS</small>
                     </span>
                     <span class="metric-card__sub">Distinct geographic destinations</span>
@@ -273,14 +273,6 @@
         {
             // Print fallback
         }
-    }
-
-    private int CalculateUniqueCountries()
-    {
-        return Pilgrimage.Current.Stops
-            .Select(s => s.DisplayPlace)
-            .Distinct()
-            .Count();
     }
 
     public void Dispose()

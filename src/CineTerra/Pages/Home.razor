@@ -225,18 +225,6 @@ else
     private IReadOnlyList<FilmingLocation> _allLocations = [];
     private Scene? _currentFlagshipScene;
 
-    private record ScenicChapter(
-        string LocationId,
-        string ChapterTag,
-        string FilmTitle,
-        string LocationName,
-        string ShortPlace,
-        string FullPlace,
-        string Narrative,
-        string ImageUrl,
-        string Alignment
-    );
-
     private readonly List<ScenicChapter> _chapters =
     [
         new ScenicChapter(
